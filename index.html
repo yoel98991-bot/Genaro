@@ -1934,6 +1934,7 @@
       const precioTotalVenta = cant * precioUnitario;
       const costoTotalVenta = cant * productoVentaSeleccionado.costo;
       productoVentaSeleccionado.cantidad -= cant;
+      
       if(tipo === 'contado') {
          ventas.unshift({
             id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
@@ -1946,12 +1947,15 @@
          let cli = clientes.find(c => c.id == clienteId);
          if (!cli) { mostrarToast('Cliente no encontrado'); return; }
          cli.deuda += precioTotalVenta;
+         
          ventas.unshift({
             id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
             producto: productoVentaSeleccionado.nombre + ' (Fiado a ' + cli.nombre + ')',
-            cantidad: cant, ingreso: 0, costo: costoTotalVenta, ganancia: -costoTotalVenta
+            cantidad: cant, ingreso: 0, costo: costoTotalVenta, ganancia: -costoTotalVenta,
+            deudaGenerada: precioTotalVenta
          });
       }
+      
       guardarDatos(); renderizarProductos(); renderizarGridVentas(); renderizarClientes();
       document.getElementById('modal-tipo-venta').classList.remove('active');
       document.getElementById('cantidad-venta').value = 1;
@@ -2027,27 +2031,66 @@
     window.verHistorialCliente = (clienteId) => {
       const cli = clientes.find(c => c.id === clienteId);
       if (!cli) return;
+      
       const movimientos = ventas.filter(v => 
         v.producto.includes('(Fiado a ' + cli.nombre + ')') || 
         v.producto.startsWith('Abono de deuda - ' + cli.nombre)
       );
-      document.getElementById('historial-titulo').textContent = 'Historial: ' + cli.nombre;
+      
+      document.getElementById('historial-titulo').innerHTML = '<i class="fas fa-info-circle" style="color:#4A3628; margin-right:8px;"></i> Información: ' + cli.nombre;
+      
       const lista = document.getElementById('lista-historial-cliente');
+      
+      let html = `
+        <div style="background: #FCFAF8; padding: 18px; border-radius: 18px; margin-bottom: 20px; border: 1px solid #EBE6E0; text-align:center;">
+          <p style="font-size:14px; color:#8e8e93; margin-bottom:6px; font-weight:500;">Deuda Total Actual</p>
+          <h3 style="font-size:28px; color:#DC2626; margin:0;">${formatearDinero(cli.deuda)}</h3>
+        </div>
+      `;
+
       if (movimientos.length === 0) {
-        lista.innerHTML = '<li class="product-item" style="color:#8e8e93; text-align:center; display:block;">Sin movimientos registrados.</li>';
+        html += '<li class="product-item" style="color:#8e8e93; text-align:center; display:block; padding:20px;">No hay movimientos detallados.</li>';
       } else {
-        lista.innerHTML = movimientos.map(m => `
-          <li class="product-item">
-            <div>
-              <strong style="color:#2C2420;">${m.producto}</strong><br>
-              <small style="color:#8e8e93;">${m.fecha}</small>
+        html += movimientos.map(m => {
+          const esAbono = m.producto.startsWith('Abono');
+          const nombreProductoReal = m.producto.split(' (Fiado')[0];
+          
+          let cantidadTexto = '';
+          if (!esAbono) {
+            cantidadTexto = `<span style="background:#F0ECE9; color:#4A3628; padding:4px 8px; border-radius:8px; font-size:12px; font-weight:700; margin-right:8px;">${m.cantidad} und.</span>`;
+          }
+
+          let montoTexto = '';
+          let colorMonto = '';
+          
+          if (esAbono) {
+            montoTexto = '+' + formatearDinero(m.ingreso);
+            colorMonto = '#16A34A';
+          } else {
+            const deudaValor = m.deudaGenerada || m.costo; 
+            montoTexto = '-' + formatearDinero(deudaValor);
+            colorMonto = '#DC2626';
+          }
+
+          return `
+          <li class="product-item" style="align-items:flex-start; padding: 16px 0;">
+            <div style="flex:1;">
+              <div style="color:#2C2420; font-size:15px; font-weight:600; margin-bottom:6px; display:flex; align-items:center;">
+                ${cantidadTexto} ${nombreProductoReal}
+              </div>
+              <small style="color:#8e8e93; font-weight:500;">${m.fecha}</small>
             </div>
-            <div style="font-weight:700; color:${m.ingreso > 0 ? '#16A34A' : '#DC2626'}">
-              ${m.ingreso > 0 ? '+' + formatearDinero(m.ingreso) : formatearDinero(m.costo)}
+            <div style="font-weight:700; color:${colorMonto}; text-align:right;">
+              <span style="font-size:11px; font-weight:700; color:#8e8e93; display:block; text-transform:uppercase; margin-bottom:2px;">
+                ${esAbono ? 'Pagó' : 'Se llevó'}
+              </span>
+              ${montoTexto}
             </div>
           </li>
-        `).join('');
+        `}).join('');
       }
+      
+      lista.innerHTML = html;
       document.getElementById('modal-historial-cliente').classList.add('active');
     };
 
@@ -2605,7 +2648,7 @@
         id: Date.now() + Math.random(),
         descripcion: `Nómina: ${emp.nombre} (${emp.cargo})`,
         monto: emp.sueldo,
-        esPagoDeuda: false, // Las nóminas SÍ afectan la ganancia y la caja
+        esPagoDeuda: false, 
         fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})
       });
 
