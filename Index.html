@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Almacén · Finanzas y Fórmulas</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Almacén Pro">
+  <meta name="theme-color" content="#F8F6F4">
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F8F6F4; color: #2C2420; padding-bottom: 90px;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { -webkit-tap-highlight-color: transparent; }
+    input:focus, button:focus, select:focus, textarea:focus {
+      outline: none !important; box-shadow: none !important;
+    }
+    button, .tab, .icon-btn, .btn, .grid-card, .nav-item {
+      outline: none; -webkit-tap-highlight-color: transparent;
+    }
+    .status-bar {
+      background: #F8F6F4; padding: 12px 20px 6px; display: flex; justify-content: space-between;
+      font-size: 15px; font-weight: 600; color: #2C2420; border-bottom: 1px solid #EBE6E0;
+      align-items: center;
+    }
+    .status-bar span { display: flex; align-items: center; gap: 8px; }
+    .app-header { padding: 20px 20px 12px; display: flex; justify-content: space-between; align-items: center; }
+    .app-header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; color: #2C2420; margin: 0; }
+    .header-actions { display: flex; gap: 8px; }
+    .header-actions .icon-btn {
+      width: 40px; height: 40px; background: #F8F6F4; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: #4A3628;
+      font-size: 18px; border: none; cursor: pointer;
+    }
+    .app-container { max-width: 500px; margin: 0 auto; background: #F8F6F4; min-height: 100vh; position: relative; }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+      display: flex; justify-content: space-between; padding: 10px 10px 24px;
+      border-top: 1px solid #EBE6E0; z-index: 1000; max-width: 500px; margin: 0 auto;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: none; border: none; color: #A09691; font-size: 10px; flex: 1;
+      font-weight: 600; gap: 4px; cursor: pointer; outline: none;
+      -webkit-tap-highlight-color: transparent; transition: color 0.2s;
+    }
+    .nav-item.active { color: #4A3628; }
+    .nav-item i { font-size: 22px; }
+    
+    .section { display: none; padding: 0 20px 20px; animation: fadeIn 0.3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Tarjetas y Contenedores */
+    .card {
+      background: #ffffff; border-radius: 24px; padding: 22px; margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(44, 36, 32, 0.04); border: 1px solid #EBE6E0;
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-header h3 { font-size: 19px; font-weight: 700; color: #2C2420; }
+    .badge { background: #F0ECE9; color: #4A3628; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    
+    /* Listas y Elementos */
+    .product-list { list-style: none; }
+    .product-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; border-bottom: 1px solid #F4EFEA;
+    }
+    .product-item:last-child { border-bottom: none; }
+    .product-info { flex: 1; }
+    .product-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: #2C2420; }
+    .product-stock { font-size: 18px; font-weight: 700; color: #2C2420; }
+    .product-unit { font-size: 14px; font-weight: 500; color: #8e8e93; margin-left: 2px; }
+    .product-price { font-size: 13px; color: #34c759; font-weight: 600; margin-top: 6px; display: block; }
+    .product-cost { font-size: 13px; color: #D97706; font-weight: 600; margin-top: 6px; display: block; }
+    
+    .icon-btn {
+      background: #F0ECE9; border: none; width: 42px; height: 42px; border-radius: 21px;
+      display: flex; align-items: center; justify-content: center; color: #4A3628;
+      font-size: 18px; cursor: pointer; transition: 0.2s;
+    }
+    .icon-btn:active { background: #E0D6D0; transform: scale(0.92); }
+    .icon-btn.danger { color: #DC2626; background: #FCE8E8; }
+    
+    /* Formularios y Botones */
+    .input-field, .select-unit {
+      background: #FCFAF8; border: 1px solid #EBE6E0; border-radius: 16px;
+      padding: 16px 18px; font-size: 16px; font-family: inherit; outline: none; transition: 0.2s; width: 100%; color: #2C2420;
+    }
+    .input-field:focus, .select-unit:focus { border-color: #4A3628; background: #fff; box-shadow: 0 0 0 3px rgba(74, 54, 40, 0.1); }
+    
+    .btn {
+      background: #4A3628; color: white; border: none; padding: 18px 24px; border-radius: 18px;
+      font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.2s; width: 100%; text-align: center;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-outline { background: transparent; color: #4A3628; border: 2px solid #4A3628; }
+    
+    .flex-row { display: flex; align-items: center; gap: 12px; }
+
+    /* Recetas */
+    .recipe-box { background: #FCFAF8; border-radius: 18px; padding: 18px; margin: 18px 0; border: 1px solid #EBE6E0; }
+    .recipe-title { font-weight: 700; margin-bottom: 14px; font-size: 16px; color: #2C2420; }
+    .ingredient-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #D6CCC4; font-size: 15px; }
+    .resumen-produccion { background: #F0ECE9; border-radius: 16px; padding: 18px; margin: 18px 0; font-weight: 500; font-size: 15px; border: 1px solid #EBE6E0; color: #4A3628; }
+    .costo-destacado { background: #F0FDF4; color: #16A34A; padding: 14px; border-radius: 14px; margin-top: 14px; font-weight: 600; text-align: center; font-size: 16px; border: 1px solid #BBF7D0; }
+    .ingredient-selector-item { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .delete-btn { background: #DC2626; color: white; border: none; width: 40px; height: 40px; border-radius: 20px; font-size: 16px; cursor: pointer; }
+
+    /* Modales */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(28, 20, 18, 0.6);
+      backdrop-filter: blur(6px); display: flex; align-items: flex-end; justify-content: center;
+      z-index: 2000; visibility: hidden; opacity: 0; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .modal-overlay.active { visibility: visible; opacity: 1; }
+    .modal-sheet {
+      background: #ffffff; width: 100%; max-width: 500px; border-radius: 32px 32px 0 0;
+      padding: 28px 24px 44px; max-height: 85vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .modal-overlay.active .modal-sheet { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-title { font-size: 22px; font-weight: 700; color: #2C2420; }
+    .close-modal { background: #F8F6F4; border: none; width: 40px; height: 40px; border-radius: 20px; font-size: 18px; color: #8e8e93; cursor: pointer; }
+    
+    /* Grid Visual */
+    .visual-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+    .grid-card {
+      background: #FCFAF8; border: 2px solid #EBE6E0; border-radius: 20px; padding: 20px 14px;
+      text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .grid-card:active { transform: scale(0.95); }
+    .grid-card i { font-size: 34px; color: #4A3628; margin-bottom: 12px; }
+    .grid-card .name { font-weight: 600; font-size: 15px; color: #2C2420; margin-bottom: 6px; line-height: 1.2; }
+    .grid-card .stock { font-size: 14px; color: #8e8e93; font-weight: 500; }
+    
+    /* Finanzas */
+    .finanzas-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .dash-card { background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #EBE6E0; }
+    .dash-label { font-size: 12px; font-weight: 600; color: #8e8e93; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .dash-value { font-size: 24px; font-weight: 700; color: #2C2420; }
+    
+    .venta-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #F4EFEA; }
+    .venta-item:last-child { border-bottom: none; }
+    .venta-info h4 { font-size: 15px; margin-bottom: 4px; color: #2C2420; }
+    .venta-info p { font-size: 13px; color: #8e8e93; }
+    .venta-monto { font-weight: 700; color: #34c759; font-size: 16px; }
+
+    /* Estilos para Radio Buttons */
+    .radio-group { display: flex; gap: 12px; margin-bottom: 20px; }
+    .radio-option {
+      flex: 1; background: #FCFAF8; border: 2px solid #EBE6E0; border-radius: 16px; padding: 16px;
+      text-align: center; font-weight: 600; cursor: pointer; transition: 0.2s; position: relative; color: #2C2420;
+    }
+    .radio-option input { display: none; }
+    .radio-option.selected { border-color: #4A3628; background: #F0ECE9; color: #4A3628; }
+
+    .toast-message {
+      position: fixed; top: 20px; left: 20px; right: 20px; background: rgba(44, 36, 32, 0.95); color: white;
+      padding: 16px 20px; border-radius: 40px; font-weight: 600; text-align: center; backdrop-filter: blur(10px);
+      opacity: 0; transform: translateY(-100%); transition: 0.3s; pointer-events: auto; z-index: 3000; cursor: pointer;
+    }
+    .toast-message.show { opacity: 1; transform: translateY(0); }
+    
+    .sync-indicator {
+      display: flex; align-items: center; gap: 6px; cursor: pointer; opacity: 0.8;
+      transition: color 0.3s, background 0.3s; background: transparent;
+      border-radius: 20px; padding: 6px 14px !important; width: auto !important;
+      font-size: 13px; font-weight: 600;
+    }
+    .sync-indicator.synced { color: #16A34A; background: #F0FDF4; }
+    .sync-indicator.syncing { color: #D97706; background: #FFFBEB; animation: pulse 1.5s infinite; }
+    .sync-indicator.error { color: #DC2626; background: #FEF2F2; }
+    .sync-indicator.offline { color: #8e8e93; background: #F8F6F4; }
+    @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+    .stock-low { color: #DC2626 !important; }
+    .badge-warning {
+      background: #FEF3C7; color: #92400E; padding: 4px 10px; border-radius: 12px; font-size: 11px; margin-left: 6px; font-weight: 700;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div id="pantalla-carga" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#F8F6F4; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <div class="spinner" style="border:4px solid #EBE6E0; border-top:4px solid #4A3628; border-radius:50%; width:44px; height:44px; animation:spin 1s linear infinite; margin-bottom:24px;"></div>
+      <h2 id="lbl-carga" style="font-size:18px; color:#2C2420;">Cargando...</h2>
+  </div>
+  <style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+
+<div class="app-container">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>
+      <i class="fas fa-signal"></i> <i class="fas fa-wifi"></i> <i class="fas fa-battery-full"></i>
+      <span id="bcv-rate" style="margin-left:12px; font-weight:600; font-size:15px;">Bs. --</span>
+    </span>
+  </div>
+  <div class="app-header">
+    <h1>Almacén <span style="font-weight: 400; color: #8e8e93;">Pro</span></h1>
+    <div class="header-actions">
+      <button class="icon-btn sync-indicator" id="btn-sync-status" title="Estado de sincronización">
+        <i class="fas fa-cloud"></i>
+        <span id="sync-text">Sin conexión</span>
+      </button>
+      <button class="icon-btn" id="btn-exportar" title="Guardar respaldo"><i class="fas fa-download"></i></button>
+      <button class="icon-btn" id="btn-importar" title="Restaurar respaldo"><i class="fas fa-upload"></i></button>
+    </div>
+  </div>
+
+  <input type="file" id="input-importar" accept=".json" style="display:none;">
+
+  <section id="inventario" class="section active">
+    <div class="card">
+      <div class="card-header">
+        <h3>Inventario actual</h3>
+        <span class="badge" id="total-productos">0 prod.</span>
+      </div>
+      <input type="text" id="buscar-producto" placeholder="🔍 Buscar producto o ingrediente..." class="input-field" style="margin-bottom: 16px;">
+      <ul class="product-list" id="lista-productos"></ul>
+    </div>
+  </section>
+
+  <section id="ventas" class="section">
+    <div class="card">
+      <div class="card-header">
+        <h3>Vender producto</h3>
+      </div>
+      <input type="text" id="buscar-venta" placeholder="🔍 Buscar producto..." class="input-field" style="margin-bottom: 12px;">
+      <div class="visual-grid" id="grid-venta-directa"></div>
+      <div id="venta-producto-seleccionado" style="display: none; text-align: center; margin-top: 16px;">
+        <h4 id="lbl-producto-venta" style="font-size: 18px; color: #4A3628; margin-bottom: 4px;">Producto</h4>
+        <p id="lbl-stock-venta" style="color: #8e8e93; font-size: 14px;">Stock: 0</p>
+        <div class="flex-row" style="margin-top: 16px;">
+          <input type="number" id="cantidad-venta" class="input-field" value="1" min="1" step="1" style="flex:1;">
+          <button class="btn" id="iniciar-venta" style="background: #16A34A; flex:2;"><i class="fas fa-check"></i> Vender</button>
+        </div>
+        <button class="btn btn-outline" style="margin-top:12px;" id="btn-cancelar-venta">← Cancelar</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="produccion" class="section">
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fas fa-cookie-bite"></i> Producir Lote</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="icon-btn" id="btn-agregar-receta" style="background: #4A3628; color: white; width: 40px; height: 40px;"><i class="fas fa-plus"></i></button>
+          <button class="icon-btn danger" id="btn-eliminar-receta" style="width: 40px; height: 40px;"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <label style="font-weight: 600; display:block; margin-bottom:8px;">Receta a preparar:</label>
+        <select id="receta-select" class="select-unit"></select>
+      </div>
+      <div class="flex-row" style="margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label style="font-weight: 600; display:block; margin-bottom:8px;" id="label-cantidad">Cantidad (latas):</label>
+          <input type="number" id="cantidad-produccion" class="input-field" value="1" min="0.01" step="0.01">
+        </div>
+      </div>
+      
+      <div id="resumen-produccion" class="resumen-produccion"></div>
+      <div class="recipe-box" id="receta-dinamica"></div>
+      
+      <button class="btn" id="ejecutar-produccion" style="margin-top: 10px;"><i class="fas fa-play-circle"></i> Confirmar Producción</button>
+    </div>
+
+    <div class="card" id="card-conversion" style="display: none;">
+      <div class="card-header">
+        <h3><i class="fas fa-cubes"></i> Convertir sueltas</h3>
+      </div>
+      <p style="font-size: 13px; color: #8e8e93; margin-bottom: 12px;" id="info-conversion"></p>
+      <button class="btn btn-outline" id="convertir-sueltas" style="width: 100%;"><i class="fas fa-exchange-alt"></i> Empaquetar</button>
+      <div id="estado-sueltas" style="margin-top: 14px; font-weight: 600; font-size: 14px; text-align: center; color: #2C2420;"></div>
+    </div>
+  </section>
+
+  <section id="clientes" class="section">
+    <div class="card">
+      <div class="card-header">
+        <h3>Directorio de Clientes</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="icon-btn" id="btn-agregar-cliente" style="background: #4A3628; color: white; width: 40px; height: 40px;" title="Nuevo cliente"><i class="fas fa-user-plus"></i></button>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #8e8e93; margin-bottom: 16px;">Aquí puedes ver quién te debe dinero y registrar los abonos a sus cuentas.</p>
+      <ul class="product-list" id="lista-clientes"></ul>
+    </div>
+  </section>
+
+  <section id="empleados" class="section">
+    <div class="card">
+      <div class="card-header">
+        <h3>Equipo de Trabajo</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="icon-btn" onclick="abrirModalEmpleado()" style="background: #4A3628; color: white; width: 40px; height: 40px;" title="Nuevo empleado">
+            <i class="fas fa-user-plus"></i>
+          </button>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #8e8e93; margin-bottom: 16px;">Administra tu personal y registra los pagos de nómina directamente a los gastos operativos.</p>
+      <ul class="product-list" id="lista-empleados"></ul>
+    </div>
+  </section>
+
+  <section id="proveedores" class="section">
+    <div class="card">
+      <div class="card-header">
+        <h3>Cuentas por Pagar</h3>
+        <div style="display: flex; gap: 8px;">
+          <button class="icon-btn" onclick="abrirModalNuevoProveedor()" style="background: #D97706; color: white; width: 40px; height: 40px;" title="Nuevo proveedor">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #8e8e93; margin-bottom: 16px;">Controla tus compras fiadas y paga a tus proveedores sin afectar tu ganancia.</p>
+      <ul class="product-list" id="lista-proveedores"></ul>
+    </div>
+  </section>
+
+  <section id="finanzas" class="section">
+    <div class="finanzas-dashboard">
+      <div class="dash-card" style="background:#F0FDF4; border-color:#BBF7D0;">
+        <div class="dash-label">Caja (Efectivo)</div>
+        <div class="dash-value" id="fin-caja" style="color: #16A34A;">$0.00</div>
+      </div>
+      <div class="dash-card" style="background:#FFFBEB; border-color:#FDE68A;">
+        <div class="dash-label">Deuda Proveedores</div>
+        <div class="dash-value" id="fin-por-pagar" style="color: #D97706;">$0.00</div>
+      </div>
+      
+      <div class="dash-card">
+        <div class="dash-label">Ganancia Neta</div>
+        <div class="dash-value" id="fin-ganancia" style="color: #16A34A;">$0.00</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Gastos Operativos</div>
+        <div class="dash-value" id="fin-gastos" style="color: #D97706;">$0.00</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Capital (Inventario)</div>
+        <div class="dash-value" id="fin-compras" style="color: #4A3628;">$0.00</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Crédito (A favor)</div>
+        <div class="dash-value" id="fin-por-cobrar" style="color: #8E44AD;">$0.00</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Ingresos Brutos</div>
+        <div class="dash-value" id="fin-ingresos" style="color: #2C2420;">$0.00</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-label">Costo de Ventas</div>
+        <div class="dash-value" id="fin-costos" style="color: #DC2626;">$0.00</div>
+      </div>
+    </div>
+
+    <button class="btn btn-outline" onclick="ingresarCajaManual()" style="width: 100%; margin-bottom: 24px; background: #fff;">
+      <i class="fas fa-hand-holding-usd"></i> Registrar Ingreso Manual a Caja
+    </button>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Gastos Operativos</h3>
+      </div>
+      <p style="font-size: 13px; color: #8e8e93; margin-bottom: 12px;">Registra cualquier gasto extra.</p>
+      <div class="flex-row" style="margin-bottom: 16px;">
+        <input type="text" id="input-desc-gasto" placeholder="Ej. Transporte" class="input-field" style="flex: 2;">
+        <input type="number" id="input-monto-gasto" placeholder="Monto" class="input-field" style="flex: 1;" step="0.01" min="0">
+      </div>
+      <button class="btn" id="btn-guardar-gasto" style="background: #D97706; margin-bottom: 20px;"><i class="fas fa-plus"></i> Registrar Gasto</button>
+      <div id="lista-gastos"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Últimos Movimientos (Ventas)</h3>
+        <button class="icon-btn danger" id="btn-limpiar-finanzas" style="width: 36px; height: 36px; font-size: 15px;"><i class="fas fa-trash"></i></button>
+      </div>
+      <div id="lista-ventas"></div>
+    </div>
+  </section>
+
+  <div class="modal-overlay" id="modal-receta">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">➕ Nueva receta</h2>
+        <button class="close-modal" id="cerrar-modal-receta"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="form-receta">
+        <input type="text" id="receta-nombre" placeholder="Nombre del producto (ej. Pan francés)" class="input-field" style="margin-bottom: 14px;">
+        <div class="flex-row" style="margin-bottom: 14px;">
+          <input type="text" id="receta-unidad" placeholder="ej. kg de harina, bandejas, litros…" class="input-field" value="latas">
+        </div>
+        <div style="margin-bottom: 14px;">
+          <div class="flex-row" style="margin-bottom: 10px;">
+            <label style="font-weight: 500;">Unidades por lata/bandeja:</label>
+            <input type="number" id="receta-unidades-por-lata" class="input-field" style="width: 100px;" value="40" min="1" step="1">
+          </div>
+          <div class="flex-row">
+            <label style="font-weight: 500;">Latas base (para cantidades):</label>
+            <input type="number" id="receta-latas-base" class="input-field" style="width: 100px;" value="45" min="1" step="1">
+          </div>
+          <p id="receta-total-unidades-base" style="margin-top: 6px; font-size: 13px; color: #8e8e93;">Total unidades base: 1800</p>
+        </div>
+        <h4 style="margin: 20px 0 10px; color:#2C2420;">Ingredientes</h4>
+        <div id="lista-ingredientes-receta"></div>
+        <button class="btn-outline btn" id="agregar-ingrediente" style="margin: 14px 0;"><i class="fas fa-plus"></i> Agregar ingrediente</button>
+        <h4 style="margin: 20px 0 10px; color:#2C2420;">Empaque (opcional)</h4>
+        <div class="flex-row">
+          <label style="width: 80px; font-weight: 500;">Paquete de</label>
+          <input type="number" id="receta-unidades-paquete" class="input-field" placeholder="10" min="1" step="1">
+          <span style="font-weight: 500;">unidades</span>
+        </div>
+        <select id="receta-bolsa" class="select-unit" style="margin-top: 10px;">
+          <option value="">Sin bolsa / suelto</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button class="btn" id="guardar-receta" style="flex:1;">Guardar receta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-tipo-venta">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmar Venta</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-tipo-venta').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <p style="color:#8e8e93; font-size:14px;">Total de la venta:</p>
+        <div style="margin-bottom: 14px; background: #FCFAF8; padding: 16px; border-radius: 16px; text-align:left; border: 1px solid #EBE6E0;">
+          <label style="font-weight:600; display:block; margin-bottom:6px; font-size:14px; color:#2C2420;">
+            Precio por unidad (USD)
+          </label>
+         <input type="number" id="input-precio-venta-modal" class="input-field" step="0.01" min="0.01" value="0" oninput="actualizarTotalVentaModal()">
+        </div>
+        <h1 style="font-size: 42px; color:#2C2420; margin-top:8px;" id="lbl-total-venta-modal">$0.00</h1>
+      </div>
+
+      <label style="font-weight: 600; display: block; margin-bottom: 14px; color:#2C2420;">¿Cómo pagará el cliente?</label>
+      <div class="radio-group">
+        <label class="radio-option selected" id="opt-contado">
+          <input type="radio" name="tipo-venta" value="contado" checked>
+          <i class="fas fa-money-bill-wave" style="font-size:20px; margin-bottom:6px;"></i><br>Contado
+        </label>
+        <label class="radio-option" id="opt-fiado">
+          <input type="radio" name="tipo-venta" value="fiado">
+          <i class="fas fa-book" style="font-size:20px; margin-bottom:6px;"></i><br>A Crédito (Fiado)
+        </label>
+      </div>
+
+      <div id="zona-cliente-fiado" style="display: none; background: #FFFBEB; padding: 18px; border-radius: 18px; border: 1px solid #FDE68A; margin-bottom: 24px;">
+        <div class="flex-row" style="gap: 10px;">
+          <button class="btn btn-outline" id="btn-seleccionar-cliente" style="flex: 2; background:#fff;">
+            <i class="fas fa-list"></i> Elegir de lista
+          </button>
+          <button class="btn btn-outline" id="btn-nuevo-cliente-rapido" style="flex: 1; background: #F0ECE9; border-color: #4A3628;">
+            <i class="fas fa-user-plus"></i> Nuevo
+          </button>
+        </div>
+        <p id="cliente-seleccionado-label" style="margin-top:10px; color:#2C2420; font-weight:600; font-size:15px;"></p>
+        <input type="hidden" id="input-cliente-id">
+      </div>
+
+      <button class="btn" id="btn-confirmar-venta-final" style="background: #16A34A;"><i class="fas fa-check"></i> Registrar Venta</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-abono">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">Registrar Abono</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-abono').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="background: #FCFAF8; padding: 20px; border-radius: 18px; margin-bottom: 24px; text-align: center; border: 1px solid #EBE6E0;">
+        <p style="font-size: 14px; color: #8e8e93; margin-bottom:4px;">Cliente</p>
+        <h3 id="lbl-abono-cliente" style="font-size: 20px; color: #2C2420; margin-bottom: 10px;">Nombre</h3>
+        <p style="font-size: 15px; color: #8e8e93;">Deuda actual: <strong id="lbl-abono-deuda" style="color:#DC2626; font-size:16px;">$0.00</strong></p>
+        <p id="lbl-abono-deuda-bs" style="font-size: 14px; color: #8e8e93; margin-top: 6px;"></p>
+      </div>
+
+      <label style="font-weight: 600; display: block; margin-bottom: 10px; color:#2C2420;">Monto que está pagando (Bs):</label>
+      <input type="number" id="input-monto-abono" class="input-field" placeholder="Ej: 500.00" step="0.01" style="margin-bottom: 10px;" oninput="actualizarEquivalenteDolarAbono()">
+      <p id="abono-dolar-equivalente" style="font-size: 14px; color: #8e8e93; margin-bottom: 20px; font-weight:500;">Equivale a: $0.00</p>
+
+      <button class="btn" id="btn-confirmar-abono">Guardar Abono</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-ingreso">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="titulo-modal-ingreso">Ajustar Stock</h2>
+        <button class="close-modal" id="cerrar-modal-ingreso"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="form-ingreso">
+        <p style="margin-bottom: 18px; font-size: 15px; color: #8e8e93;" id="desc-modal-ingreso"></p>
+        
+        <div style="background: #FCFAF8; padding: 18px; border-radius: 18px; margin-bottom: 18px; border: 1px solid #EBE6E0;">
+          <label style="font-weight: 600; display: block; margin-bottom: 14px; color:#2C2420;">📦 Modificar Stock</label>
+          <div style="margin-bottom: 14px;">
+            <select id="accion-ingreso" class="select-unit">
+              <option value="sumar">➕ Agregar al stock (Suma)</option>
+              <option value="reemplazar">🔄 Reemplazar total (Conteo físico)</option>
+              <option value="restar">➖ Descontar (Pérdida/Uso manual)</option>
+            </select>
+          </div>
+          <div class="flex-row">
+            <input type="number" id="cantidad-ingreso" class="input-field" placeholder="Cantidad..." min="0" step="any">
+            <select id="unidad-ingreso" class="select-unit" style="min-width: 110px; flex: 0.5;">
+              <option value="sacos">Sacos</option>
+              <option value="kg">Kilos (kg)</option>
+              <option value="g">Gramos (g)</option>
+              <option value="L">Litros (L)</option>
+              <option value="ml">Mililitros (ml)</option>
+              <option value="unidades">Unidades</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="zona-costo" style="background: #FFFBEB; padding: 18px; border-radius: 18px; margin-bottom: 18px; border: 1px solid #FDE68A; display: none;">
+          <label style="font-weight: 600; display: block; margin-bottom: 14px; color: #D97706;">💰 Actualizar precio de compra (opcional)</label>
+          <div class="flex-row">
+            <div style="flex:1;">
+              <label style="font-size: 13px; color: #8e8e93; font-weight: 500; display:block; margin-bottom:6px;">Nuevo costo por unidad (vacío = mantener actual)</label>
+              <input type="number" id="costo-total-producto" class="input-field" placeholder="Ej: 40.00 (precio por saco, kg…)" step="0.01">
+            </div>
+          </div>
+          <p id="lbl-costo-unitario-calculado" style="font-size: 14px; color: #D97706; margin-top: 10px; font-weight: 600;">Costo unitario actual: $0.00</p>
+          <div id="total-compra-estimado" style="background: #F0ECE9; padding: 10px 14px; border-radius: 14px; margin-top: 14px; font-weight: 600; color: #4A3628; text-align: center; display: none; border: 1px solid #EBE6E0;">
+            Total estimado de la compra: <span id="lbl-total-compra">$0.00</span>
+          </div>
+
+          <div style="margin-top:16px; border-top:1px solid #FDE68A; padding-top:16px;">
+            <label style="display:flex; align-items:center; gap:10px; font-size:14px; color:#2C2420; cursor:pointer; font-weight:500;">
+              <input type="checkbox" id="usar-paquete-costo" style="width:20px; height:20px; accent-color:#4A3628;">
+              📦 Ingresar como paquete / lote cerrado
+            </label>
+            <div id="zona-paquete-costo" style="display:none; margin-top:12px; background:#ffffff; padding:14px; border-radius:14px; border: 1px solid #EBE6E0;">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-weight:500; color:#2C2420; width:100px;">💵 Precio $</span>
+                <input type="number" id="paquete-precio" class="input-field" style="flex:1;" step="0.01" placeholder="Ej: 2.50">
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+                <span style="font-weight:500; color:#2C2420; width:100px;">📦 Cantidad</span>
+                <input type="number" id="paquete-cantidad" class="input-field" style="flex:1;" step="any" placeholder="Ej: 100">
+              </div>
+              <p id="lbl-costo-unitario-paquete" style="font-size:13px; color:#4A3628; margin-top:8px; font-weight:600;"></p>
+            </div>
+          </div>
+        </div>
+        
+        <div id="zona-pago-compra" style="background:#FCFAF8; padding:18px; border-radius:18px; margin-bottom:18px; border:1px solid #EBE6E0; display:none;">
+          <label style="font-weight:600; display:block; margin-bottom:14px; color:#2C2420;">¿Cómo pagas esta mercancía?</label>
+          <select id="metodo-pago-compra" class="select-unit" style="margin-bottom:14px;" onchange="toggleProveedorSelect()">
+            <option value="contado">💵 De contado (Sale de la Caja)</option>
+            <option value="fiado">📝 A crédito (Deuda a Proveedor)</option>
+            <option value="inicial">📦 Ajuste de Inventario (No afecta dinero)</option>
+          </select>
+          <div id="div-proveedor-compra" style="display:none;">
+            <label style="font-size:14px; color:#2C2420; font-weight:500; display:block; margin-bottom:6px;">Selecciona el proveedor:</label>
+            <div style="display:flex; gap:10px;">
+              <select id="select-proveedor-compra" class="select-unit" style="flex:1;"></select>
+              <button class="icon-btn" onclick="abrirModalNuevoProveedor()" style="background:#4A3628; color:white; width:52px; height:52px; border-radius:16px;"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="zona-precio" style="background: #F0FDF4; padding: 18px; border-radius: 18px; margin-bottom: 18px; border: 1px solid #BBF7D0; display: none;">
+          <label style="font-weight: 600; display: block; margin-bottom: 14px; color: #16A34A;">💵 Venta al Público</label>
+          <div class="flex-row">
+            <div style="flex:1;">
+              <label style="font-size: 14px; color: #2C2420; display:block; margin-bottom:6px; font-weight:500;">Precio de Venta</label>
+              <input type="number" id="precio-producto" class="input-field" placeholder="Ej: 3.50" step="0.01">
+            </div>
+          </div>
+          <div style="background:#ffffff; padding:14px; border-radius:14px; margin-top:14px; border:1px solid #BBF7D0;">
+            <label style="font-weight:600; font-size:14px; color:#16A34A; display:block; margin-bottom:6px;">💰 Costo manual (opcional)</label>
+            <input type="number" id="costo-manual-producto" class="input-field" step="0.01" placeholder="Dejar vacío para automático">
+            <p style="font-size:12px; color:#8e8e93; margin-top:6px;">Sobrescribe el costo calculado por producción.</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn" id="guardar-ingreso">Guardar Cambios</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-selector-cliente">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">Seleccionar Cliente</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-selector-cliente').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <input type="text" id="buscar-cliente" placeholder="🔍 Buscar..." class="input-field" style="margin-bottom:16px;">
+      <ul class="product-list" id="lista-seleccion-cliente"></ul>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn btn-outline" id="btn-fusionar-clientes" style="display:none;"><i class="fas fa-code-branch"></i> Fusionar seleccionados</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-historial-cliente">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="historial-titulo" style="font-size:20px;">Historial de Movimientos</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-historial-cliente').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <ul class="product-list" id="lista-historial-cliente"></ul>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="modal-empleado">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="titulo-modal-empleado">Nuevo Empleado</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-empleado').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="form-empleado">
+        <input type="hidden" id="empleado-id">
+        <label style="font-weight: 600; display:block; margin-bottom:8px; color:#2C2420;">Nombre Completo:</label>
+        <input type="text" id="empleado-nombre" placeholder="Ej. Ana Pérez" class="input-field" style="margin-bottom: 16px;">
+        
+        <label style="font-weight: 600; display:block; margin-bottom:8px; color:#2C2420;">Cargo / Rol:</label>
+        <input type="text" id="empleado-cargo" placeholder="Ej. Ayudante de cocina" class="input-field" style="margin-bottom: 16px;">
+        
+        <label style="font-weight: 600; display:block; margin-bottom:8px; color:#2C2420;">Sueldo a pagar ($):</label>
+        <input type="number" id="empleado-sueldo" placeholder="Ej. 40.00" class="input-field" step="0.01" min="0" style="margin-bottom: 24px;">
+        
+        <button class="btn" id="btn-guardar-empleado" style="background: #4A3628;"><i class="fas fa-save"></i> Guardar Datos</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-proveedor">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">Nuevo Proveedor</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-proveedor').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <label style="font-weight: 600; display:block; margin-bottom:8px; color:#2C2420;">Nombre de la empresa o persona:</label>
+      <input type="text" id="proveedor-nombre" placeholder="Ej. Comercial Distribuidora" class="input-field" style="margin-bottom: 24px;">
+      <button class="btn" id="btn-guardar-proveedor" style="background: #D97706;"><i class="fas fa-save"></i> Guardar Proveedor</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-abono-proveedor">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title">Pagar a Proveedor</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-abono-proveedor').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="background: #FFFBEB; padding: 20px; border-radius: 18px; margin-bottom: 24px; text-align: center; border: 1px solid #FDE68A;">
+        <p style="font-size: 14px; color: #8e8e93; margin-bottom:4px;">Proveedor</p>
+        <h3 id="lbl-prov-nombre" style="font-size: 20px; color: #2C2420; margin-bottom: 10px;">Nombre</h3>
+        <p style="font-size: 15px; color: #8e8e93;">Deuda pendiente: <strong id="lbl-prov-deuda" style="color:#D97706; font-size:16px;">$0.00</strong></p>
+      </div>
+      <label style="font-weight: 600; display: block; margin-bottom: 10px; color:#2C2420;">Monto a pagar (USD):</label>
+      <input type="number" id="input-monto-pago-prov" class="input-field" placeholder="Ej: 50.00" step="0.01" style="margin-bottom: 24px;">
+      <button class="btn" id="btn-confirmar-pago-prov" style="background: #D97706;"><i class="fas fa-hand-holding-usd"></i> Registrar Pago (Sale de Caja)</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast-message">Mensaje</div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="inventario"><i class="fas fa-box"></i><span>Stock</span></button>
+    <button class="nav-item" data-tab="ventas"><i class="fas fa-shopping-cart"></i><span>Vender</span></button>
+    <button class="nav-item" data-tab="produccion"><i class="fas fa-blender"></i><span>Cocina</span></button>
+    <button class="nav-item" data-tab="clientes"><i class="fas fa-users"></i><span>Clientes</span></button>
+    <button class="nav-item" data-tab="empleados"><i class="fas fa-id-badge"></i><span>Equipo</span></button>
+    <button class="nav-item" data-tab="proveedores"><i class="fas fa-truck"></i><span>Proveed.</span></button>
+    <button class="nav-item" data-tab="finanzas"><i class="fas fa-chart-line"></i><span>Finanzas</span></button>
+  </nav>
+</div>
+
+<script>
+  const supabaseUrl = 'https://sgftomrbxvroqcgiobcc.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnZnRvbXJieHZyb3FjZ2lvYmNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNTkyNzcsImV4cCI6MjA5NTczNTI3N30.DF5LXMGVrNtJq4lsoCPzLBOM8hJmq5JzRYMUKykJvIU';
+  const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('Error SW', err));
+    });
+  }
+
+  (function(){
+    "use strict";
+
+    const PRODUCTOS_INICIALES = [
+      { nombre: "Harina", cantidad: 0, unidad: "sacos", costo: 38.5, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Azúcar", cantidad: 0, unidad: "sacos", costo: 66.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Manteca", cantidad: 0, unidad: "kg", costo: 3.5, precio: 0, paqueteCantidad: 0 }, 
+      { nombre: "Micovan", cantidad: 0, unidad: "kg", costo: 7.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bicarbonato", cantidad: 0, unidad: "kg", costo: 6.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Polvo de hornear", cantidad: 0, unidad: "kg", costo: 6.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Esencias vainilla y anís", cantidad: 0, unidad: "kg", costo: 5.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Sabor vainilla", cantidad: 0, unidad: "kg", costo: 5.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Colorante", cantidad: 0, unidad: "L", costo: 11.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Guayaba", cantidad: 0, unidad: "kg", costo: 2.0, precio: 0, paqueteCantidad: 0 }, 
+      { nombre: "Arequipe (Tobo)", cantidad: 0, unidad: "kg", costo: 4.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Levadura", cantidad: 0, unidad: "kg", costo: 5.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bolsas 1k", cantidad: 0, unidad: "unidades", costo: 0.012, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bolsas 22x60", cantidad: 0, unidad: "unidades", costo: 0.028, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bolsas 24x60", cantidad: 0, unidad: "unidades", costo: 0.03, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bolsas 20x50", cantidad: 0, unidad: "unidades", costo: 0.025, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Bolsas canilla 3", cantidad: 0, unidad: "unidades", costo: 0.025, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Anís en granos", cantidad: 0, unidad: "kg", costo: 4.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Sal", cantidad: 0, unidad: "kg", costo: 0.5, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Coco", cantidad: 0, unidad: "kg", costo: 7.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Frutilla", cantidad: 0, unidad: "kg", costo: 8.0, precio: 0, paqueteCantidad: 0 },
+      { nombre: "Paquete Catalinas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.0, paqueteCantidad: 0 },
+      { nombre: "Catalinas sueltas (unidad)", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.3, paqueteCantidad: 0 },
+      { nombre: "Paquete Polvorosas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
+      { nombre: "Polvorosas sueltas (unidad)", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.35, paqueteCantidad: 0 },
+      { nombre: "Paquete Cortaos 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.0, paqueteCantidad: 0 },
+      { nombre: "Cortaos sueltas (unidad)", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.3, paqueteCantidad: 0 },
+      { nombre: "Paquete Catalinas pequeñas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
+      { nombre: "Catalinas pequeñas sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.2, paqueteCantidad: 0 },
+      { nombre: "Paquete Roscas pequeñas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
+      { nombre: "Roscas pequeñas sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.2, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan andino 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 4.0, paqueteCantidad: 0 },
+      { nombre: "Pan andino sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 2.0, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan de guayaba 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 4.0, paqueteCantidad: 0 },
+      { nombre: "Pan de guayaba sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.5, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan salado 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.0, paqueteCantidad: 0 },
+      { nombre: "Pan salado sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.6, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan francés 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.0, paqueteCantidad: 0 },
+      { nombre: "Pan francés sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.3, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan siciliano 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
+      { nombre: "Pan siciliano sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.9, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan campesino 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
+      { nombre: "Pan campesino sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 1.5, paqueteCantidad: 0 },
+      { nombre: "Paquete Lenguas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.0, paqueteCantidad: 0 },
+      { nombre: "Lenguas sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.3, paqueteCantidad: 0 }
+    ];
+
+    const UNIDADES_PERMITIDAS = ['sacos', 'kg', 'g', 'L', 'ml', 'unidades'];
+
+    const RECETAS_PREDEF = [
+      { 
+        id: 'catalinas', nombre: 'Catalinas', unidadProduccion: 'bandejas',
+        unidadesPorLata: 24, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 70, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 30 / 70, unidad: 'kg' },
+          { nombre: 'Bicarbonato', cantidad: 1 / 70, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1 / 70, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.2 / 70, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 70, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Catalinas 1kg', unidadesPorPaquete: 10 }, 
+          suelto: { nombre: 'Catalinas sueltas (unidad)' }, insumoEmpaque: { nombre: 'Bolsas 1k', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'polvorosas', nombre: 'Polvorosas blancas', unidadProduccion: 'latas',
+        unidadesPorLata: 1600 / 66.6, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 66.6, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 25 / 66.6, unidad: 'kg' },
+          { nombre: 'Polvo de hornear', cantidad: 1 / 66.6, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1.5 / 66.6, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.2 / 66.6, unidad: 'kg' }
+        ],
+        productoResultante: {
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Polvorosas 1kg', unidadesPorPaquete: 10 },
+          suelto: { nombre: 'Polvorosas sueltas (unidad)' }, insumoEmpaque: { nombre: 'Bolsas 1k', cantidadPorPaquete: 1 }
+        }
+      },
+      { 
+        id: 'cortaos', nombre: 'Cortaos', unidadProduccion: 'bandejas',
+        unidadesPorLata: 84, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 20, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 30 / 20, unidad: 'kg' },
+          { nombre: 'Bicarbonato', cantidad: 1 / 20, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1 / 20, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.2 / 20, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 20, unidad: 'kg' }
+        ],
+        productoResultante: {
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Cortaos 1kg', unidadesPorPaquete: 10 },
+          suelto: { nombre: 'Cortaos sueltas (unidad)' }, insumoEmpaque: { nombre: 'Bolsas 1k', cantidadPorPaquete: 1 }
+        }
+      },
+      { 
+        id: 'catalinas_pequenas', nombre: 'Catalinas pequeñas', unidadProduccion: 'bandejas',
+        unidadesPorLata: 48, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 90, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 30 / 90, unidad: 'kg' },
+          { nombre: 'Bicarbonato', cantidad: 1 / 90, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1 / 90, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.2 / 90, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 90, unidad: 'kg' }
+        ],
+        productoResultante: {
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Catalinas pequeñas 1kg', unidadesPorPaquete: 24 },
+          suelto: { nombre: 'Catalinas pequeñas sueltas' }, insumoEmpaque: { nombre: 'Bolsas 1k', cantidadPorPaquete: 1 }
+        }
+      },
+      { 
+        id: 'roscas_pequenas', nombre: 'Roscas pequeñas', unidadProduccion: 'latas',
+        unidadesPorLata: 35, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 113, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 11 / 113, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 0.6 / 113, unidad: 'kg' },
+          { nombre: 'Anís en granos', cantidad: 0.1 / 113, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 113, unidad: 'kg' }
+        ],
+        productoResultante: {
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Roscas pequeñas 1kg', unidadesPorPaquete: 24 },
+          suelto: { nombre: 'Roscas pequeñas sueltas' }, insumoEmpaque: { nombre: 'Bolsas 24x60', cantidadPorPaquete: 1 }
+        }
+      },
+      { 
+        id: 'pan_andino', nombre: 'Pan andino', unidadProduccion: 'bandejas',
+        unidadesPorLata: 5, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 60, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 11 / 60, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1 / 60, unidad: 'kg' },
+          { nombre: 'Levadura', cantidad: 0.1 / 60, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 / 60, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 60, unidad: 'kg' }
+        ],
+        productoResultante: {
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan andino 1kg', unidadesPorPaquete: 2 },
+          suelto: { nombre: 'Pan andino sueltas' }, insumoEmpaque: { nombre: 'Bolsas 22x60', cantidadPorPaquete: 1 }
+        }
+      },
+      { 
+        id: 'pan_guayaba', nombre: 'Pan de guayaba', unidadProduccion: 'bandejas',
+        unidadesPorLata: 28, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 11 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 1 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Guayaba', cantidad: 12 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Sal', cantidad: 0.3 * 28 / 2000, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 * 28 / 2000, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan de guayaba 1kg', unidadesPorPaquete: 10 }, 
+          suelto: { nombre: 'Pan de guayaba sueltas' }, insumoEmpaque: { nombre: 'Bolsas 20x50', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'pan_salado', nombre: 'Pan salado', unidadProduccion: 'bandejas',
+        unidadesPorLata: 12, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 49, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 2 / 49, unidad: 'kg' },
+          { nombre: 'Sal', cantidad: 1 / 49, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 2 / 49, unidad: 'kg' },
+          { nombre: 'Sabor vainilla', cantidad: 0.2 / 49, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 / 49, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan salado 1kg', unidadesPorPaquete: 5 }, 
+          suelto: { nombre: 'Pan salado sueltas' }, insumoEmpaque: { nombre: 'Bolsas canilla 3', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'pan_frances', nombre: 'Pan francés', unidadProduccion: 'bandejas',
+        unidadesPorLata: 32, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 53, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 2 / 53, unidad: 'kg' },
+          { nombre: 'Sal', cantidad: 1 / 53, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 2 / 53, unidad: 'kg' },
+          { nombre: 'Sabor vainilla', cantidad: 0.2 / 53, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 / 53, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan francés 1kg', unidadesPorPaquete: 14 }, 
+          suelto: { nombre: 'Pan francés sueltas' }, insumoEmpaque: { nombre: 'Bolsas canilla 3', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'pan_siciliano', nombre: 'Pan siciliano', unidadProduccion: 'bandejas',
+        unidadesPorLata: 8, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 59, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 2 / 59, unidad: 'kg' },
+          { nombre: 'Sal', cantidad: 1 / 59, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 2 / 59, unidad: 'kg' },
+          { nombre: 'Sabor vainilla', cantidad: 0.2 / 59, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 / 59, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan siciliano 1kg', unidadesPorPaquete: 4 }, 
+          suelto: { nombre: 'Pan siciliano sueltas' }, insumoEmpaque: { nombre: 'Bolsas canilla 3', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'pan_campesino', nombre: 'Pan campesino', unidadProduccion: 'bandejas',
+        unidadesPorLata: 5, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 52.6, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 2 / 52.6, unidad: 'kg' },
+          { nombre: 'Sal', cantidad: 1 / 52.6, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 2 / 52.6, unidad: 'kg' },
+          { nombre: 'Sabor vainilla', cantidad: 0.2 / 52.6, unidad: 'kg' },
+          { nombre: 'Micovan', cantidad: 0.25 / 52.6, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Pan campesino 1kg', unidadesPorPaquete: 2 }, 
+          suelto: { nombre: 'Pan campesino sueltas' }, insumoEmpaque: { nombre: 'Bolsas canilla 3', cantidadPorPaquete: 1 } 
+        }
+      },
+      { 
+        id: 'lenguas', nombre: 'Lenguas', unidadProduccion: 'latas',
+        unidadesPorLata: 14, latasBase: 1,
+        ingredientes: [
+          { nombre: 'Harina', cantidad: 45 / 121, unidad: 'kg' },
+          { nombre: 'Azúcar', cantidad: 12 / 121, unidad: 'kg' },
+          { nombre: 'Manteca', cantidad: 0.5 / 121, unidad: 'kg' },
+          { nombre: 'Esencias vainilla y anís', cantidad: 0.2 / 121, unidad: 'kg' }
+        ],
+        productoResultante: { 
+          tipo: 'compuesto', paquete: { nombre: 'Paquete Lenguas 1kg', unidadesPorPaquete: 10 }, 
+          suelto: { nombre: 'Lenguas sueltas' }, insumoEmpaque: { nombre: 'Bolsas 22x60', cantidadPorPaquete: 1 } 
+        }
+      }
+    ];
+
+    let productos = [], recetas = [], ventas = [], clientes = [], gastos = [], compras = [], producciones = [], empleados = [], proveedores = [];
+    let recetaActual = null, prodEditando = null, productoVentaSeleccionado = null, clienteAbonoActual = null, proveedorAbonoActual = null;
+    let ultimaActualizacionLocal = null;
+    let ingredientesTemporales = [];
+    let bcvRate = 0;
+    let syncStatus = 'offline';
+    let sincronizando = false;
+    let papeleraVentas = [], papeleraGastos = [];
+    let clientesSeleccionadosFusion = [];
+
+    const toastEl = document.getElementById('toast');
+    function mostrarToast(texto, duracion = 2500) {
+      toastEl.textContent = texto; toastEl.classList.add('show');
+      setTimeout(() => { toastEl.classList.remove('show'); toastEl.onclick = null; }, duracion);
+    }
+
+    function formatearDinero(monto) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(monto || 0);
+    }
+
+    function actualizarIndicadorSync(estado) {
+      syncStatus = estado;
+      const btn = document.getElementById('btn-sync-status');
+      const text = document.getElementById('sync-text');
+      btn.className = 'icon-btn sync-indicator ' + estado;
+      switch (estado) {
+        case 'synced': text.textContent = 'Sincronizado'; break;
+        case 'syncing': text.textContent = 'Sincronizando…'; break;
+        case 'error': text.textContent = 'Error'; break;
+        case 'offline': default: text.textContent = 'Sin conexión'; break;
+      }
+    }
+
+    function esProductoFinal(nombre) {
+      const n = nombre.toLowerCase();
+      return n.includes('paquete') || n.includes('suelta') || n.includes('pan') || n.includes('lenguas');
+    }
+
+    function convertirABase(cantidad, unidadOrigen, unidadBase, nombreProducto = "") {
+      if (unidadOrigen === unidadBase) return cantidad;
+      let factorSaco = 1; 
+      const nom = nombreProducto.toLowerCase();
+      if (nom.includes('harina')) factorSaco = 45; 
+      if (nom.includes('azúcar') || nom.includes('azucar')) factorSaco = 50; 
+      if (unidadBase === 'sacos' && unidadOrigen === 'kg') return cantidad / factorSaco;
+      if (unidadBase === 'kg' && unidadOrigen === 'sacos') return cantidad * factorSaco;
+      if (unidadBase === 'sacos' && unidadOrigen === 'g') return (cantidad / 1000) / factorSaco;
+      if (unidadBase === 'g' && unidadOrigen === 'sacos') return (cantidad * factorSaco) * 1000;
+      if (unidadBase === 'kg' && unidadOrigen === 'g') return cantidad / 1000;
+      if (unidadBase === 'g' && unidadOrigen === 'kg') return cantidad * 1000;
+      if (unidadBase === 'L' && unidadOrigen === 'ml') return cantidad / 1000;
+      if (unidadBase === 'ml' && unidadOrigen === 'L') return cantidad * 1000;
+      if (unidadBase === 'unidades' || unidadOrigen === 'unidades') return cantidad;
+      return cantidad;
+    }
+
+    function encontrarProducto(nombre) {
+      return productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
+    }
+
+    function cargarLocal() {
+      const p = localStorage.getItem('almacen_fusion_productos_v7_esencias'); 
+      if (p) productos = JSON.parse(p); else productos = [...PRODUCTOS_INICIALES];
+      productos.forEach(prod => { if (prod.paqueteCantidad === undefined) prod.paqueteCantidad = 0; });
+      const r = localStorage.getItem('almacen_fusion_recetas_v7_esencias'); 
+      if (r) recetas = JSON.parse(r); else recetas = [...RECETAS_PREDEF];
+      recetas.forEach(receta => {
+        if (receta.unidadesPorLata === undefined) {
+          receta.unidadesPorLata = receta.unidadesPorProduccion || 1;
+          receta.latasBase = 1;
+        }
+      });
+      const v = localStorage.getItem('almacen_fusion_ventas_v7_esencias'); 
+      if (v) ventas = JSON.parse(v); else ventas = [];
+      const c = localStorage.getItem('almacen_fusion_clientes_v7_esencias'); 
+      if (c) clientes = JSON.parse(c); else clientes = [];
+      const g = localStorage.getItem('almacen_fusion_gastos_v7_esencias'); 
+      if (g) gastos = JSON.parse(g); else gastos = [];
+      const com = localStorage.getItem('almacen_fusion_compras_v7_esencias');
+      if (com) compras = JSON.parse(com); else compras = [];
+      const prod = localStorage.getItem('almacen_fusion_producciones_v7_esencias');
+      if (prod) producciones = JSON.parse(prod); else producciones = [];
+      const emp = localStorage.getItem('almacen_fusion_empleados_v7');
+      if (emp) empleados = JSON.parse(emp); else empleados = [];
+      const prov = localStorage.getItem('almacen_fusion_proveedores_v7');
+      if (prov) proveedores = JSON.parse(prov); else proveedores = [];
+      
+      ultimaActualizacionLocal = localStorage.getItem('almacen_ultima_actualizacion') || null;
+    }
+
+    function guardarLocal() {
+      localStorage.setItem('almacen_fusion_productos_v7_esencias', JSON.stringify(productos));
+      localStorage.setItem('almacen_fusion_recetas_v7_esencias', JSON.stringify(recetas));
+      localStorage.setItem('almacen_fusion_ventas_v7_esencias', JSON.stringify(ventas));
+      localStorage.setItem('almacen_fusion_clientes_v7_esencias', JSON.stringify(clientes));
+      localStorage.setItem('almacen_fusion_gastos_v7_esencias', JSON.stringify(gastos));
+      localStorage.setItem('almacen_fusion_compras_v7_esencias', JSON.stringify(compras));
+      localStorage.setItem('almacen_fusion_producciones_v7_esencias', JSON.stringify(producciones));
+      localStorage.setItem('almacen_fusion_empleados_v7', JSON.stringify(empleados));
+      localStorage.setItem('almacen_fusion_proveedores_v7', JSON.stringify(proveedores));
+      const ahora = new Date().toISOString();
+      localStorage.setItem('almacen_ultima_actualizacion', ahora);
+      ultimaActualizacionLocal = ahora;
+    }
+
+    async function guardarDatos() {
+      guardarLocal();
+      renderizarFinanzas();
+      renderizarGastos();
+      if (!sincronizando) {
+        sincronizando = true;
+        actualizarIndicadorSync('syncing');
+        try {
+          const estadoCompleto = {
+            productos, recetas, ventas, clientes, gastos, compras, producciones, empleados, proveedores,
+            ultima_actualizacion: ultimaActualizacionLocal
+          };
+          const { error } = await supabaseClient.from('estado_almacen').upsert({ id: 1, datos: estadoCompleto });
+          if (error) throw error;
+          actualizarIndicadorSync('synced');
+        } catch (e) {
+          console.error("⚠️ Falló la sincronización.", e);
+          actualizarIndicadorSync('error');
+        } finally {
+          sincronizando = false;
+        }
+      }
+    }
+
+    async function cargarDatos() {
+      const lblCarga = document.getElementById('lbl-carga'); 
+      const pantallaCarga = document.getElementById('pantalla-carga');
+      if(lblCarga) lblCarga.textContent = "Sincronizando con la nube...";
+      if(pantallaCarga) pantallaCarga.style.display = 'flex';
+      actualizarIndicadorSync('syncing');
+      try {
+        cargarLocal();
+        const { data, error } = await supabaseClient.from('estado_almacen').select('datos').eq('id', 1).single();
+        if (error && error.code !== 'PGRST116') throw error;
+        if (data && data.datos && Object.keys(data.datos).length > 0) {
+          const remoto = data.datos;
+          const fechaRemota = remoto.ultima_actualizacion;
+          const fechaLocal = ultimaActualizacionLocal;
+          
+          function fusionarProductosRemotos(productosRemotos) {
+            return productosRemotos.map(prodRemoto => {
+              const prodLocal = productos.find(p => p.nombre === prodRemoto.nombre);
+              return {
+                ...prodRemoto,
+                paqueteCantidad: prodRemoto.paqueteCantidad ?? prodLocal?.paqueteCantidad ?? 0
+              };
+            });
+          }
+          
+          if (fechaLocal && fechaRemota) {
+            const localEsMasNuevo = new Date(fechaLocal) > new Date(fechaRemota);
+            if (localEsMasNuevo) {
+              await guardarDatos();
+              if(lblCarga) lblCarga.textContent = "✅ Datos locales subidos";
+            } else if (new Date(fechaRemota) > new Date(fechaLocal)) {
+              productos = fusionarProductosRemotos(remoto.productos || productos);
+              recetas   = remoto.recetas || recetas;
+              ventas    = remoto.ventas || ventas;
+              clientes  = remoto.clientes || clientes;
+              gastos    = remoto.gastos || gastos;
+              compras   = remoto.compras || compras;
+              producciones = remoto.producciones || producciones;
+              empleados = remoto.empleados || empleados;
+              proveedores = remoto.proveedores || proveedores;
+              ultimaActualizacionLocal = fechaRemota;
+              guardarLocal();
+              if(lblCarga) lblCarga.textContent = "✅ Datos de la nube aplicados";
+            } else {
+              if(lblCarga) lblCarga.textContent = "✅ Sincronización OK";
+            }
+            actualizarIndicadorSync('synced');
+          } else if (!fechaLocal && fechaRemota) {
+            productos = fusionarProductosRemotos(remoto.productos || productos);
+            recetas   = remoto.recetas || recetas;
+            ventas    = remoto.ventas || ventas;
+            clientes  = remoto.clientes || clientes;
+            gastos    = remoto.gastos || gastos;
+            compras   = remoto.compras || compras;
+            producciones = remoto.producciones || producciones;
+            empleados = remoto.empleados || empleados;
+            proveedores = remoto.proveedores || proveedores;
+            ultimaActualizacionLocal = fechaRemota;
+            guardarLocal();
+            if(lblCarga) lblCarga.textContent = "✅ Datos de la nube aplicados";
+            actualizarIndicadorSync('synced');
+          } else if (fechaLocal && !fechaRemota) {
+            await guardarDatos();
+            if(lblCarga) lblCarga.textContent = "✅ Datos locales subidos";
+            actualizarIndicadorSync('synced');
+          } else {
+            if(lblCarga) lblCarga.textContent = "✅ Listo (sin datos previos)";
+            actualizarIndicadorSync('synced');
+          }
+        } else {
+          await guardarDatos();
+          if(lblCarga) lblCarga.textContent = "✅ Datos locales enviados a la nube";
+          actualizarIndicadorSync('synced');
+        }
+      } catch (error) {
+        console.warn("⚠️ Sin conexión o error. Usando datos locales.", error);
+        if(lblCarga) {
+          lblCarga.textContent = '❌ Error, usando modo local';
+          lblCarga.style.color = '#ff3b30';
+        }
+        actualizarIndicadorSync('error');
+      } finally {
+        setTimeout(() => { if(pantallaCarga) pantallaCarga.style.display = 'none'; }, 1000);
+        productos.forEach(prod => { if (prod.paqueteCantidad === undefined) prod.paqueteCantidad = 0; });
+        recetas.forEach(receta => {
+          if (receta.unidadesPorLata === undefined) {
+            receta.unidadesPorLata = receta.unidadesPorProduccion || 1;
+            receta.latasBase = 1;
+          }
+        });
+        renderizarProductos();
+        renderizarGridVentas();
+        renderizarClientes();
+        renderizarEmpleados();
+        renderizarProveedores();
+        llenarSelectorRecetas();
+        renderizarGastos();
+        renderizarFinanzas();
+        if(recetas.length) { 
+          recetaActual = recetas[0]; 
+          const sel = document.getElementById('receta-select');
+          if(sel) sel.value = recetaActual.id;
+          actualizarVistaReceta(); 
+        }
+      }
+    }
+
+    // ---------- INVENTARIO ----------
+    function renderizarProductos(filtro = '') {
+      const termino = filtro.trim().toLowerCase();
+      const filtrados = termino ? productos.filter(p => p.nombre.toLowerCase().includes(termino)) : productos;
+      document.getElementById('total-productos').textContent = `${productos.length} prod.`;
+      
+      document.getElementById('lista-productos').innerHTML = filtrados.map(prod => {
+        const cant = prod.cantidad;
+        let stockDisplay = '';
+        let tagFinanciero = '';
+        let infoExtra = '';
+        let stockWarning = '';
+
+        if (prod.paqueteCantidad > 0) {
+          const paquetes = Math.floor(cant / prod.paqueteCantidad);
+          const resto = cant % prod.paqueteCantidad;
+          stockDisplay = `<div class="product-stock">${paquetes} <span class="product-unit">paq.</span> <small style="color:#8e8e93;">(${cant} ${prod.unidad})</small></div>`;
+          if (resto > 0) stockDisplay += `<small style="color:#8e8e93;"> (${resto} sueltos)</small>`;
+        } else {
+          stockDisplay = `<div class="product-stock">${cant} <span class="product-unit">${prod.unidad}</span></div>`;
+        }
+
+        if (!esProductoFinal(prod.nombre)) {
+          if ((prod.unidad === 'sacos' && cant < 0.5) || (prod.unidad === 'kg' && cant < 5) || (prod.unidad === 'g' && cant < 500) || (prod.unidad === 'L' && cant < 2)) {
+            stockWarning = '<span class="badge-warning">Bajo</span>';
+          }
+        }
+
+        if (prod.unidad && prod.unidad.toLowerCase().includes('saco')) {
+            const kgPerSaco = prod.nombre.toLowerCase().includes('harina') ? 45 : 50;
+            const totalKg = (cant * kgPerSaco).toFixed(2);
+            infoExtra = `<div style="font-size: 13px; color: #4A3628; margin-top: 6px; font-weight: 600;">Equivale a: ${totalKg} kg disponibles</div>`;
+        } else if (prod.unidad === 'kg' && cant > 0) {
+            const totalGramos = (cant * 1000).toFixed(0);
+            infoExtra = `<div style="font-size: 13px; color: #4A3628; margin-top: 6px; font-weight: 600;">Equivale a: ${totalGramos} g / ml disponibles</div>`;
+        } else if (prod.unidad === 'L' && cant > 0) {
+            const totalMl = (cant * 1000).toFixed(0);
+            infoExtra = `<div style="font-size: 13px; color: #4A3628; margin-top: 6px; font-weight: 600;">Equivale a: ${totalMl} ml disponibles</div>`;
+        } else if (prod.unidad === 'g' && cant >= 1000) {
+            const totalKg = (cant / 1000).toFixed(2);
+            infoExtra = `<div style="font-size: 13px; color: #4A3628; margin-top: 6px; font-weight: 600;">Equivale a: ${totalKg} kg</div>`;
+        } else if (prod.unidad === 'ml' && cant >= 1000) {
+            const totalL = (cant / 1000).toFixed(2);
+            infoExtra = `<div style="font-size: 13px; color: #4A3628; margin-top: 6px; font-weight: 600;">Equivale a: ${totalL} Litros</div>`;
+        }
+
+        if (esProductoFinal(prod.nombre)) {
+          tagFinanciero = `<span class="product-price">Venta Público: ${formatearDinero(prod.precio)}</span>`;
+        } else {
+          let sacoDetalle = '';
+          if (prod.unidad === 'sacos') {
+            const kg = prod.nombre.toLowerCase().includes('harina') ? 45 : 50;
+            sacoDetalle = ` <span style="color:#c6c6c8; font-weight:400;">(${kg}kg c/u)</span>`;
+          }
+          const costoTotalStock = cant * prod.costo;
+          tagFinanciero = `<span class="product-cost">Total invertido: ${formatearDinero(costoTotalStock)} &nbsp;<small style="font-weight:400;">( ${formatearDinero(prod.costo)} / ${prod.unidad}${sacoDetalle} )</small></span>`;
+        }
+
+        return `
+          <li class="product-item">
+            <div class="product-info">
+              <div class="product-name">${prod.nombre} ${stockWarning}</div>
+              ${stockDisplay}
+              ${infoExtra}
+              ${tagFinanciero}
+            </div>
+            <div class="product-actions" style="display:flex; align-items:center; gap:6px;">
+              <button class="icon-btn" style="width:34px; height:34px; font-size:15px;" onclick="ajusteRapido('${prod.nombre}', -1)">–</button>
+              <button class="icon-btn" style="width:34px; height:34px; font-size:15px;" onclick="ajusteRapido('${prod.nombre}', 1)">+</button>
+              <button class="icon-btn" onclick="abrirModalIngreso('${prod.nombre}')"><i class="fas fa-sliders-h"></i></button>
+            </div>
+          </li>`;
+      }).join('');
+      actualizarSelectorBolsasReceta();
+    }
+
+    window.ajusteRapido = function(nombre, delta) {
+      const prod = encontrarProducto(nombre);
+      if (!prod) return;
+      let incremento = delta;
+      if (prod.paqueteCantidad > 0) incremento = delta * prod.paqueteCantidad;
+      if (incremento > 0 && !esProductoFinal(prod.nombre)) {
+        const costoTotalCompra = incremento * prod.costo;
+        compras.push({
+          id: Date.now() + Math.random(),
+          fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+          producto: prod.nombre,
+          cantidad: incremento,
+          unidad: prod.unidad,
+          costoUnitario: prod.costo,
+          total: costoTotalCompra,
+          metodo: 'inicial' 
+        });
+      }
+      prod.cantidad = Math.max(0, prod.cantidad + incremento);
+      guardarDatos();
+      renderizarProductos(document.getElementById('buscar-producto').value);
+    };
+
+    function actualizarSelectorBolsasReceta() {
+      const bolsas = productos.filter(p => p.nombre.toLowerCase().includes('bolsa'));
+      document.getElementById('receta-bolsa').innerHTML = `<option value="">Sin bolsa / suelto</option>` + 
+        bolsas.map(p => `<option value="${p.nombre}">${p.nombre}</option>`).join('');
+    }
+
+    window.abrirModalIngreso = function(nombre) {
+      prodEditando = encontrarProducto(nombre);
+      document.getElementById('titulo-modal-ingreso').textContent = `Ajustar ${prodEditando.nombre}`;
+      document.getElementById('desc-modal-ingreso').innerHTML = `Stock actual en sistema: <strong>${prodEditando.cantidad.toFixed(2)} ${prodEditando.unidad}</strong>`;
+      document.getElementById('cantidad-ingreso').value = '';
+      document.getElementById('accion-ingreso').value = 'sumar';
+      
+      const selectUnidad = document.getElementById('unidad-ingreso');
+      selectUnidad.value = prodEditando.unidad;
+      if(selectUnidad.value !== prodEditando.unidad) selectUnidad.value = 'unidades';
+      
+      if (esProductoFinal(prodEditando.nombre)) {
+        document.getElementById('zona-costo').style.display = 'none';
+        document.getElementById('zona-pago-compra').style.display = 'none';
+        document.getElementById('zona-precio').style.display = 'block';
+        document.getElementById('precio-producto').value = prodEditando.precio > 0 ? prodEditando.precio : '';
+        document.getElementById('costo-manual-producto').value = prodEditando.costo > 0 ? prodEditando.costo : '';
+      } else {
+        document.getElementById('zona-precio').style.display = 'none';
+        document.getElementById('zona-costo').style.display = 'block';
+        document.getElementById('zona-pago-compra').style.display = 'block';
+        document.getElementById('metodo-pago-compra').value = 'contado';
+        toggleProveedorSelect();
+        actualizarSelectProveedoresCompra();
+        document.getElementById('costo-total-producto').value = '';
+        calcularCostoUnitario();
+        actualizarTotalCompraEstimado();
+      }
+
+      const usarPaquete = prodEditando.paqueteCantidad > 0;
+      document.getElementById('usar-paquete-costo').checked = usarPaquete;
+      document.getElementById('zona-paquete-costo').style.display = usarPaquete ? 'block' : 'none';
+      if (usarPaquete) {
+        document.getElementById('paquete-precio').value = (prodEditando.costo * prodEditando.paqueteCantidad).toFixed(2);
+        document.getElementById('paquete-cantidad').value = prodEditando.paqueteCantidad;
+        calcularCostoDesdePaquete();
+      }
+
+      document.getElementById('modal-ingreso').classList.add('active');
+    };
+
+    document.getElementById('cerrar-modal-ingreso').addEventListener('click', () => {
+      document.getElementById('modal-ingreso').classList.remove('active');
+    });
+
+    window.toggleProveedorSelect = function() {
+      const metodo = document.getElementById('metodo-pago-compra').value;
+      document.getElementById('div-proveedor-compra').style.display = metodo === 'fiado' ? 'block' : 'none';
+    };
+
+    window.actualizarSelectProveedoresCompra = function() {
+      const select = document.getElementById('select-proveedor-compra');
+      if(proveedores.length === 0) {
+        select.innerHTML = '<option value="">-- No hay proveedores --</option>';
+      } else {
+        select.innerHTML = proveedores.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+      }
+    };
+
+    function calcularCostoUnitario() {
+      if(!prodEditando || esProductoFinal(prodEditando.nombre)) return;
+      const nuevoCosto = parseFloat(document.getElementById('costo-total-producto').value);
+      const unidadSel = document.getElementById('unidad-ingreso').value;
+      const costoActual = prodEditando.costo;
+      if (!isNaN(nuevoCosto) && nuevoCosto > 0) {
+        document.getElementById('lbl-costo-unitario-calculado').innerHTML = `🔁 El costo se actualizará a: <strong>${formatearDinero(nuevoCosto)}</strong> por <strong>${unidadSel}</strong>`;
+      } else {
+        document.getElementById('lbl-costo-unitario-calculado').innerHTML = `Costo unitario actual: <strong>${formatearDinero(costoActual)}</strong> por <strong>${prodEditando.unidad}</strong> (no se modificará)`;
+      }
+    }
+
+    function actualizarTotalCompraEstimado() {
+      const cantidad = parseFloat(document.getElementById('cantidad-ingreso').value) || 0;
+      const costoUnit = parseFloat(document.getElementById('costo-total-producto').value) || prodEditando?.costo || 0;
+      const accion = document.getElementById('accion-ingreso').value;
+      let cantidadEstimada = cantidad;
+      if (accion === 'reemplazar') {
+        const stockAnterior = prodEditando?.cantidad || 0;
+        cantidadEstimada = Math.max(0, cantidad - stockAnterior);
+      }
+      const total = cantidadEstimada * costoUnit;
+      const divEstimado = document.getElementById('total-compra-estimado');
+      if (total > 0 && cantidadEstimada > 0) {
+        divEstimado.style.display = 'block';
+        document.getElementById('lbl-total-compra').textContent = formatearDinero(total);
+      } else {
+        divEstimado.style.display = 'none';
+      }
+      
+      if(accion === 'restar' || esProductoFinal(prodEditando.nombre)) {
+        document.getElementById('zona-pago-compra').style.display = 'none';
+      } else if (accion === 'sumar' || (accion === 'reemplazar' && cantidadEstimada > 0)) {
+        document.getElementById('zona-pago-compra').style.display = 'block';
+      }
+    }
+
+    document.getElementById('guardar-ingreso').addEventListener('click', () => {
+      const cantIngresada = parseFloat(document.getElementById('cantidad-ingreso').value);
+      const unidadSel = document.getElementById('unidad-ingreso').value;
+      const accion = document.getElementById('accion-ingreso').value;
+      const stockAnterior = prodEditando.cantidad;
+      
+      if (unidadSel !== prodEditando.unidad) {
+         prodEditando.cantidad = convertirABase(prodEditando.cantidad, prodEditando.unidad, unidadSel, prodEditando.nombre);
+         if (prodEditando.costo > 0) {
+             const factorConversion = convertirABase(1, unidadSel, prodEditando.unidad, prodEditando.nombre);
+             prodEditando.costo = prodEditando.costo * factorConversion;
+         }
+         prodEditando.unidad = unidadSel;
+      }
+      
+      if (!isNaN(cantIngresada) && cantIngresada > 0) {
+        if (accion === 'sumar') prodEditando.cantidad += cantIngresada;
+        else if (accion === 'reemplazar') prodEditando.cantidad = cantIngresada;
+        else if (accion === 'restar') {
+          if (prodEditando.cantidad >= cantIngresada) prodEditando.cantidad -= cantIngresada;
+          else { mostrarToast('Stock insuficiente para restar'); return; }
+        }
+      }
+      
+      let cantidadComprada = 0;
+      if (accion === 'sumar') cantidadComprada = cantIngresada;
+      else if (accion === 'reemplazar') cantidadComprada = Math.max(0, cantIngresada - stockAnterior);
+
+      if (esProductoFinal(prodEditando.nombre)) {
+        const nuevoPrecio = parseFloat(document.getElementById('precio-producto').value);
+        if(!isNaN(nuevoPrecio)) prodEditando.precio = nuevoPrecio;
+        const costoManual = parseFloat(document.getElementById('costo-manual-producto').value);
+        if (!isNaN(costoManual) && costoManual >= 0) prodEditando.costo = costoManual;
+      } else {
+        const nuevoCostoUnitario = parseFloat(document.getElementById('costo-total-producto').value);
+        if(!isNaN(nuevoCostoUnitario) && nuevoCostoUnitario > 0) prodEditando.costo = nuevoCostoUnitario;
+      }
+      
+      const usarPaquete = document.getElementById('usar-paquete-costo').checked;
+      if (usarPaquete) {
+        prodEditando.paqueteCantidad = parseFloat(document.getElementById('paquete-cantidad').value) || 0;
+      } else {
+        prodEditando.paqueteCantidad = 0;
+      }
+
+      if (cantidadComprada > 0 && !esProductoFinal(prodEditando.nombre)) {
+        const metodoPago = document.getElementById('metodo-pago-compra').value;
+        const proveedorId = document.getElementById('select-proveedor-compra').value;
+        const costoUnitarioActual = prodEditando.costo;
+        const totalCompra = cantidadComprada * costoUnitarioActual;
+        
+        if (metodoPago === 'fiado' && !proveedorId) {
+          mostrarToast('Por favor selecciona a qué proveedor le debes.'); return;
+        }
+
+        compras.push({
+          id: Date.now() + Math.random(),
+          fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+          producto: prodEditando.nombre,
+          cantidad: cantidadComprada,
+          unidad: prodEditando.unidad,
+          costoUnitario: costoUnitarioActual,
+          total: totalCompra,
+          metodo: metodoPago 
+        });
+
+        if (metodoPago === 'fiado') {
+          const prov = proveedores.find(p => p.id == proveedorId);
+          if (prov) prov.deuda += totalCompra;
+        }
+      }
+      
+      guardarDatos();
+      renderizarProductos(document.getElementById('buscar-producto').value);
+      if (document.getElementById('finanzas').classList.contains('active')) renderizarFinanzas();
+      if (document.getElementById('proveedores').classList.contains('active')) renderizarProveedores();
+      
+      document.getElementById('modal-ingreso').classList.remove('active');
+      mostrarToast('✅ Cambios guardados', 1500);
+    });
+
+    document.getElementById('cantidad-ingreso').addEventListener('input', () => {
+      calcularCostoUnitario();
+      actualizarTotalCompraEstimado();
+    });
+    document.getElementById('costo-total-producto').addEventListener('input', () => {
+      calcularCostoUnitario();
+      actualizarTotalCompraEstimado();
+    });
+    document.getElementById('accion-ingreso').addEventListener('change', () => {
+      calcularCostoUnitario();
+      actualizarTotalCompraEstimado();
+    });
+    document.getElementById('cantidad-ingreso').addEventListener('focus', actualizarTotalCompraEstimado);
+
+    // ---------- PRODUCCIÓN ----------
+    function actualizarVistaReceta() {
+      if (!recetaActual) return;
+      const cantidadLatas = parseFloat(document.getElementById('cantidad-produccion').value) || 1;
+      const unidadesPorLata = recetaActual.unidadesPorLata;
+      const latasBase = recetaActual.latasBase;
+      const factorEscala = cantidadLatas / latasBase;
+      const totalUnidades = cantidadLatas * unidadesPorLata;
+      let html = `<div class="recipe-title">🧾 Ingredientes para ${cantidadLatas} ${recetaActual.unidadProduccion} (${totalUnidades.toFixed(0)} unid.)</div>`;
+      let costoTotalReceta = 0;
+      recetaActual.ingredientes.forEach(ing => {
+        const prodDB = encontrarProducto(ing.nombre);
+        const cantidadNecesaria = ing.cantidad * factorEscala; 
+        let costoIngrediente = 0;
+        if (prodDB) {
+           const cantEnBaseDB = convertirABase(cantidadNecesaria, ing.unidad, prodDB.unidad, ing.nombre);
+           costoIngrediente = prodDB.costo * cantEnBaseDB;
+        }
+        costoTotalReceta += costoIngrediente;
+        html += `<div class="ingredient-row">
+          <span>${ing.nombre}</span> 
+          <span><strong>${cantidadNecesaria.toFixed(3)} ${ing.unidad}</strong> <small style="color:#8e8e93">(${formatearDinero(costoIngrediente)})</small></span>
+        </div>`;
+      });
+      let paquetes = 0;
+      if (recetaActual.productoResultante.tipo === 'compuesto') {
+        const up = recetaActual.productoResultante.paquete.unidadesPorPaquete;
+        paquetes = Math.floor(totalUnidades / up);
+        if (recetaActual.productoResultante.insumoEmpaque) {
+          const bolsaDB = encontrarProducto(recetaActual.productoResultante.insumoEmpaque.nombre);
+          const costoBolsas = bolsaDB ? (bolsaDB.costo * paquetes) : 0;
+          costoTotalReceta += costoBolsas;
+          html += `<div class="ingredient-row">
+            <span>${recetaActual.productoResultante.insumoEmpaque.nombre}</span> 
+            <span><strong>${paquetes} und</strong> <small style="color:#8e8e93">(${formatearDinero(costoBolsas)})</small></span>
+          </div>`;
+        }
+      }
+      const costoPorPaquete = paquetes > 0 ? (costoTotalReceta / paquetes) : 0;
+      const costoPorUnidadSuelta = totalUnidades > 0 ? (costoTotalReceta / totalUnidades) : 0;
+      if (recetaActual.productoResultante.tipo === 'compuesto') {
+         const pPaq = encontrarProducto(recetaActual.productoResultante.paquete.nombre);
+         if (pPaq && paquetes > 0) pPaq.costo = costoPorPaquete;
+         const pSuelto = encontrarProducto(recetaActual.productoResultante.suelto.nombre);
+         if (pSuelto && totalUnidades > 0) pSuelto.costo = costoPorUnidadSuelta;
+      } else {
+         const pSuelto = encontrarProducto(recetaActual.productoResultante.suelto.nombre);
+         if (pSuelto && totalUnidades > 0) pSuelto.costo = costoPorUnidadSuelta;
+      }
+      html += `<div class="costo-destacado">Total Costo Inversión: ${formatearDinero(costoTotalReceta)}</div>`;
+      if(paquetes > 0) html += `<div style="text-align:center; font-size:13px; color:#8e8e93; margin-top:10px;">Costo de hacer 1 paquete: ${formatearDinero(costoPorPaquete)}</div>`;
+      document.getElementById('receta-dinamica').innerHTML = html;
+      
+      let resumen = `<i class="fas fa-cookie"></i> Producción Total: <strong>${totalUnidades.toFixed(0)} unid.</strong>`;
+      if (recetaActual.productoResultante.tipo === 'compuesto') {
+        resumen += `<br><i class="fas fa-box" style="margin-top:6px;"></i> Paquetes armados: <strong>${paquetes}</strong>`;
+        const sueltasRestantes = totalUnidades % recetaActual.productoResultante.paquete.unidadesPorPaquete;
+        resumen += `<br><i class="fas fa-cubes" style="margin-top:6px;"></i> Unidades sueltas: <strong>${sueltasRestantes.toFixed(0)}</strong>`;
+        document.getElementById('card-conversion').style.display = 'block';
+        const sueltoNom = recetaActual.productoResultante.suelto.nombre;
+        const paqueteNom = recetaActual.productoResultante.paquete.nombre;
+        const ups = recetaActual.productoResultante.paquete.unidadesPorPaquete;
+        document.getElementById('info-conversion').textContent = `Convierte ${ups} ${sueltoNom} en 1 ${paqueteNom} usando una bolsa.`;
+        const pSueltas = encontrarProducto(sueltoNom);
+        document.getElementById('estado-sueltas').innerHTML = `${sueltoNom} en stock: ${pSueltas ? pSueltas.cantidad : 0} unidades`;
+      } else {
+        document.getElementById('card-conversion').style.display = 'none';
+      }
+      document.getElementById('resumen-produccion').innerHTML = resumen;
+    }
+
+    document.getElementById('ejecutar-produccion').addEventListener('click', () => {
+      if (!recetaActual) return;
+      const cantidadLatas = parseFloat(document.getElementById('cantidad-produccion').value) || 1;
+      const unidadesPorLata = recetaActual.unidadesPorLata;
+      const latasBase = recetaActual.latasBase;
+      const factorEscala = cantidadLatas / latasBase;
+      const totalUnidades = cantidadLatas * unidadesPorLata;
+      for (let ing of recetaActual.ingredientes) {
+        const prod = encontrarProducto(ing.nombre);
+        if (!prod) { mostrarToast(`Producto "${ing.nombre}" no existe en inventario`, 2500); return; }
+        const cantidadNecesaria = ing.cantidad * factorEscala;
+        const reqConvertida = convertirABase(cantidadNecesaria, ing.unidad, prod.unidad, ing.nombre);
+        if (prod.cantidad < reqConvertida) { 
+          mostrarToast(`Falta ${ing.nombre} (necesitas ${reqConvertida.toFixed(3)} ${prod.unidad} en stock)`, 3500); 
+          return; 
+        }
+      }
+      let paquetes = 0;
+      let costoProduccion = 0; 
+      for (let ing of recetaActual.ingredientes) {
+        const p = encontrarProducto(ing.nombre);
+        const cantidadNecesaria = ing.cantidad * factorEscala;
+        const cantConvertida = convertirABase(cantidadNecesaria, ing.unidad, p.unidad, ing.nombre);
+        costoProduccion += p.costo * cantConvertida;
+        p.cantidad -= cantConvertida;
+      }
+      if (recetaActual.productoResultante.tipo === 'compuesto') {
+        const up = recetaActual.productoResultante.paquete.unidadesPorPaquete;
+        paquetes = Math.floor(totalUnidades / up);
+        if (recetaActual.productoResultante.insumoEmpaque) {
+          const insumo = recetaActual.productoResultante.insumoEmpaque;
+          const prodIns = encontrarProducto(insumo.nombre);
+          if (!prodIns || prodIns.cantidad < paquetes) { 
+            mostrarToast(`Faltan bolsas: ${insumo.nombre} (necesitas ${paquetes})`, 2500); 
+            return; 
+          }
+          prodIns.cantidad -= paquetes;
+          costoProduccion += prodIns.costo * paquetes;
+        }
+        let pPaq = encontrarProducto(recetaActual.productoResultante.paquete.nombre);
+        if (!pPaq) { 
+          pPaq = { nombre: recetaActual.productoResultante.paquete.nombre, cantidad: 0, unidad: 'unidades', costo: 0, precio: 0, paqueteCantidad: 0 };
+          productos.push(pPaq);
+        }
+        pPaq.cantidad += paquetes;
+        let pSuel = encontrarProducto(recetaActual.productoResultante.suelto.nombre);
+        if (!pSuel) { 
+          pSuel = { nombre: recetaActual.productoResultante.suelto.nombre, cantidad: 0, unidad: 'unidades', costo: 0, precio: 0, paqueteCantidad: 0 };
+          productos.push(pSuel);
+        }
+        pSuel.cantidad += totalUnidades % up;
+      } else {
+        let pSuel = encontrarProducto(recetaActual.productoResultante.suelto.nombre);
+        if (!pSuel) { 
+          pSuel = { nombre: recetaActual.productoResultante.suelto.nombre, cantidad: 0, unidad: 'unidades', costo: 0, precio: 0, paqueteCantidad: 0 };
+          productos.push(pSuel);
+        }
+        pSuel.cantidad += totalUnidades;
+      }
+      
+      producciones.push({
+        id: Date.now(),
+        fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+        producto: recetaActual.nombre,
+        cantidad: totalUnidades.toFixed(0),
+        costo: costoProduccion
+      });
+      
+      guardarDatos();
+      renderizarProductos(); 
+      actualizarVistaReceta();
+      mostrarToast('✅ ¡Producción completada!', 2500);
+    });
+
+    document.getElementById('convertir-sueltas').addEventListener('click', () => {
+      if (!recetaActual || recetaActual.productoResultante.tipo !== 'compuesto') return;
+      const up = recetaActual.productoResultante.paquete.unidadesPorPaquete;
+      const suelto = encontrarProducto(recetaActual.productoResultante.suelto.nombre);
+      const paquete = encontrarProducto(recetaActual.productoResultante.paquete.nombre);
+      const bolsa = recetaActual.productoResultante.insumoEmpaque ? encontrarProducto(recetaActual.productoResultante.insumoEmpaque.nombre) : null;
+      if (!suelto || suelto.cantidad < up) { mostrarToast(`Necesitas al menos ${up} unidades sueltas`); return; }
+      if (bolsa && bolsa.cantidad < 1) { mostrarToast('Faltan bolsas en el inventario'); return; }
+      suelto.cantidad -= up;
+      if (bolsa) bolsa.cantidad -= 1;
+      paquete.cantidad += 1;
+      guardarDatos(); renderizarProductos(''); actualizarVistaReceta();
+      mostrarToast(`📦 Convertido ${up} unidades en 1 paquete`);
+    });
+
+    document.getElementById('receta-unidades-por-lata').addEventListener('input', actualizarTotalUnidadesBase);
+    document.getElementById('receta-latas-base').addEventListener('input', actualizarTotalUnidadesBase);
+    function actualizarTotalUnidadesBase() {
+      const u = parseFloat(document.getElementById('receta-unidades-por-lata').value) || 0;
+      const l = parseFloat(document.getElementById('receta-latas-base').value) || 0;
+      document.getElementById('receta-total-unidades-base').textContent = `Total unidades base: ${u * l}`;
+    }
+
+    document.getElementById('btn-agregar-receta').addEventListener('click', () => {
+      ingredientesTemporales = [];
+      document.getElementById('receta-nombre').value = '';
+      document.getElementById('receta-unidad').value = 'latas';
+      document.getElementById('receta-unidades-por-lata').value = 40;
+      document.getElementById('receta-latas-base').value = 45;
+      actualizarTotalUnidadesBase();
+      document.getElementById('receta-unidades-paquete').value = '';
+      renderizarIngredientesTemporales();
+      document.getElementById('modal-receta').classList.add('active');
+    });
+
+    document.getElementById('cerrar-modal-receta').addEventListener('click', () => {
+      document.getElementById('modal-receta').classList.remove('active');
+    });
+
+    function renderizarIngredientesTemporales() {
+      const contenedor = document.getElementById('lista-ingredientes-receta');
+      let html = '';
+      ingredientesTemporales.forEach((ing, idx) => {
+        html += `<div class="ingredient-selector-item">
+          <select class="select-unit ing-nombre" style="flex: 2;" onchange="actualizarIngNombre(${idx}, this.value)">
+            ${productos.map(p => `<option value="${p.nombre}" ${p.nombre === ing.nombre ? 'selected' : ''}>${p.nombre}</option>`).join('')}
+          </select>
+          <input type="number" class="input-field ing-cantidad" value="${ing.cantidad}" step="0.001" min="0" style="flex: 1;" oninput="actualizarIngCant(${idx}, this.value)">
+          <select class="select-unit ing-unidad" style="flex: 1.2;" onchange="actualizarIngUnidad(${idx}, this.value)">
+            ${UNIDADES_PERMITIDAS.map(u => `<option ${ing.unidad === u ? 'selected' : ''}>${u}</option>`).join('')}
+          </select>
+          <button class="delete-btn" onclick="eliminarIngTemporal(${idx})"><i class="fas fa-trash"></i></button>
+        </div>`;
+      });
+      contenedor.innerHTML = html || '<p class="text-small" style="color:#8e8e93;">Aún no hay ingredientes. Agrega al menos uno.</p>';
+    }
+
+    window.actualizarIngNombre = (idx, val) => ingredientesTemporales[idx].nombre = val;
+    window.actualizarIngCant = (idx, val) => ingredientesTemporales[idx].cantidad = parseFloat(val);
+    window.actualizarIngUnidad = (idx, val) => ingredientesTemporales[idx].unidad = val;
+    window.eliminarIngTemporal = (idx) => { ingredientesTemporales.splice(idx, 1); renderizarIngredientesTemporales(); };
+
+    document.getElementById('agregar-ingrediente').addEventListener('click', () => {
+      ingredientesTemporales.push({ nombre: productos[0]?.nombre || '', cantidad: 0, unidad: 'kg' });
+      renderizarIngredientesTemporales();
+    });
+
+    document.getElementById('guardar-receta').addEventListener('click', () => {
+      const nombre = document.getElementById('receta-nombre').value.trim();
+      if (!nombre) { mostrarToast('Nombre requerido', 1500); return; }
+      const unidad = document.getElementById('receta-unidad').value.trim() || 'unidad';
+      const unidadesPorLata = parseFloat(document.getElementById('receta-unidades-por-lata').value);
+      const latasBase = parseFloat(document.getElementById('receta-latas-base').value);
+      if (!unidadesPorLata || unidadesPorLata <= 0 || !latasBase || latasBase <= 0) { mostrarToast('Valores inválidos en unidades o latas base', 1500); return; }
+      if (ingredientesTemporales.length === 0) { mostrarToast('Agrega al menos un ingrediente', 1500); return; }
+      for (let ing of ingredientesTemporales) {
+        if (!ing.nombre || isNaN(ing.cantidad) || ing.cantidad <= 0) { mostrarToast('Completa todos los ingredientes', 1500); return; }
+      }
+      const id = 'receta_' + Date.now();
+      const paqueteUnidades = document.getElementById('receta-unidades-paquete').value;
+      const bolsaSeleccionada = document.getElementById('receta-bolsa').value;
+      let productoResultante;
+      if (paqueteUnidades && parseInt(paqueteUnidades) > 0) {
+        const uPaq = parseInt(paqueteUnidades);
+        const nombrePaquete = `Paquete ${nombre} ${uPaq}u`;
+        if (!productos.some(p => p.nombre === nombrePaquete)) productos.push({ nombre: nombrePaquete, cantidad: 0, unidad: 'unidades', costo:0, precio:0, paqueteCantidad: 0 });
+        const nombreSuelto = `${nombre} sueltas`;
+        if (!productos.some(p => p.nombre === nombreSuelto)) productos.push({ nombre: nombreSuelto, cantidad: 0, unidad: 'unidades', costo:0, precio:0, paqueteCantidad: 0 });
+        productoResultante = {
+          tipo: 'compuesto',
+          paquete: { nombre: nombrePaquete, unidadesPorPaquete: uPaq },
+          suelto: { nombre: nombreSuelto },
+          insumoEmpaque: bolsaSeleccionada ? { nombre: bolsaSeleccionada, cantidadPorPaquete: 1 } : null
+        };
+      } else {
+        const nombreSuelto = `${nombre} (unidad)`;
+        if (!productos.some(p => p.nombre === nombreSuelto)) productos.push({ nombre: nombreSuelto, cantidad: 0, unidad: 'unidades', costo:0, precio:0, paqueteCantidad: 0 });
+        productoResultante = { tipo: 'simple', suelto: { nombre: nombreSuelto } };
+      }
+      const nuevaReceta = {
+        id, nombre, unidadProduccion: unidad,
+        unidadesPorLata, latasBase,
+        ingredientes: ingredientesTemporales.map(ing => ({ ...ing })),
+        productoResultante
+      };
+      recetas.push(nuevaReceta);
+      guardarDatos();
+      llenarSelectorRecetas();
+      document.getElementById('receta-select').value = id;
+      recetaActual = nuevaReceta;
+      actualizarVistaReceta();
+      renderizarProductos();
+      document.getElementById('modal-receta').classList.remove('active');
+      mostrarToast(`✅ Receta "${nombre}" creada`, 2000);
+    });
+
+    document.getElementById('btn-eliminar-receta').addEventListener('click', () => {
+      if (!recetaActual) return;
+      if (!confirm(`¿Eliminar receta "${recetaActual.nombre}"?`)) return;
+      recetas = recetas.filter(r => r.id !== recetaActual.id);
+      guardarDatos();
+      if (recetas.length) recetaActual = recetas[0]; else recetaActual = null;
+      llenarSelectorRecetas();
+      actualizarVistaReceta();
+    });
+
+    function llenarSelectorRecetas() {
+      const recetaSelect = document.getElementById('receta-select');
+      recetaSelect.innerHTML = recetas.map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
+    }
+
+    // ---------- VENTAS ----------
+    function renderizarGridVentas(filtro = '') {
+      const grid = document.getElementById('grid-venta-directa');
+      let vendibles = productos.filter(p => esProductoFinal(p.nombre));
+      if (filtro) {
+        const term = filtro.toLowerCase();
+        vendibles = vendibles.filter(p => p.nombre.toLowerCase().includes(term));
+      }
+      grid.innerHTML = vendibles.map(p => {
+        let icono = p.nombre.toLowerCase().includes('pan') ? 'fa-bread-slice' : 'fa-box-open';
+        if(p.nombre.toLowerCase().includes('suelta')) icono = 'fa-cookie';
+        return `
+          <div class="grid-card" onclick="seleccionarProductoVenta('${p.nombre}')">
+            <i class="fas ${icono}"></i>
+            <div class="name">${p.nombre}</div>
+            <div class="stock">${p.cantidad} disp.</div>
+            <div style="font-weight:700; color:#16A34A; margin-top:6px;">${formatearDinero(p.precio)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    window.seleccionarProductoVenta = (nombre) => {
+      productoVentaSeleccionado = encontrarProducto(nombre);
+      document.getElementById('lbl-producto-venta').textContent = productoVentaSeleccionado.nombre;
+      document.getElementById('lbl-stock-venta').textContent = `Stock: ${productoVentaSeleccionado.cantidad} | Precio: ${formatearDinero(productoVentaSeleccionado.precio)}`;
+      document.getElementById('venta-producto-seleccionado').style.display = 'block';
+      document.getElementById('grid-venta-directa').style.display = 'none';
+      document.getElementById('buscar-venta').style.display = 'none';
+    };
+
+    document.getElementById('btn-cancelar-venta').addEventListener('click', () => {
+      document.getElementById('venta-producto-seleccionado').style.display = 'none';
+      document.getElementById('grid-venta-directa').style.display = 'grid';
+      document.getElementById('buscar-venta').style.display = 'block';
+      productoVentaSeleccionado = null;
+    });
+
+    document.getElementById('buscar-venta').addEventListener('input', e => renderizarGridVentas(e.target.value));
+
+    document.getElementById('iniciar-venta').addEventListener('click', () => {
+      if(!productoVentaSeleccionado) { mostrarToast('Selecciona un producto primero', 2000); return; }
+      const cant = parseInt(document.getElementById('cantidad-venta').value);
+      if(isNaN(cant) || cant <= 0) return;
+      if(productoVentaSeleccionado.cantidad < cant) { mostrarToast('Stock insuficiente', 2000); return; }
+      const precioDefault = productoVentaSeleccionado.precio;
+      document.getElementById('input-precio-venta-modal').value = precioDefault;
+      actualizarTotalVentaModal();
+      document.getElementById('cliente-seleccionado-label').textContent = '';
+      document.getElementById('input-cliente-id').value = '';
+      document.getElementById('zona-cliente-fiado').style.display = 'none';
+      document.querySelector('input[value="contado"]').checked = true;
+      document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById('opt-contado').classList.add('selected');
+      document.getElementById('modal-tipo-venta').classList.add('active');
+    });
+
+    function actualizarTotalVentaModal() {
+      const cantidad = parseInt(document.getElementById('cantidad-venta').value) || 0;
+      const precioUnit = parseFloat(document.getElementById('input-precio-venta-modal').value) || 0;
+      const nuevoTotal = cantidad * precioUnit;
+      const lbl = document.getElementById('lbl-total-venta-modal');
+      const textoActual = lbl.textContent.replace(/[^0-9.-]+/g, '');
+      const totalActual = parseFloat(textoActual) || 0;
+      if (totalActual === nuevoTotal) {
+        lbl.textContent = formatearDinero(nuevoTotal);
+        return;
+      }
+      const duracion = 400;
+      const inicio = performance.now();
+      function animar(ahora) {
+        const transcurrido = ahora - inicio;
+        const progreso = Math.min(transcurrido / duracion, 1);
+        const eased = 1 - Math.pow(1 - progreso, 3);
+        const valorActual = totalActual + (nuevoTotal - totalActual) * eased;
+        lbl.textContent = formatearDinero(valorActual);
+        if (progreso < 1) {
+          requestAnimationFrame(animar);
+        } else {
+          lbl.textContent = formatearDinero(nuevoTotal);
+        }
+      }
+      requestAnimationFrame(animar);
+    }
+    window.actualizarTotalVentaModal = actualizarTotalVentaModal;
+    
+    document.querySelectorAll('.radio-option').forEach(opcion => {
+      opcion.addEventListener('click', function(e) {
+        document.querySelectorAll('.radio-option').forEach(el => el.classList.remove('selected'));
+        this.classList.add('selected');
+        const radio = this.querySelector('input[type="radio"]');
+        if (radio) {
+          radio.checked = true;
+          if (radio.value === 'fiado') {
+            document.getElementById('zona-cliente-fiado').style.display = 'block';
+          } else {
+            document.getElementById('zona-cliente-fiado').style.display = 'none';
+          }
+        }
+      });
+    });
+
+    document.getElementById('btn-seleccionar-cliente').addEventListener('click', () => {
+      document.getElementById('modal-selector-cliente').classList.add('active');
+      clientesSeleccionadosFusion = [];
+      renderizarListaClientesSeleccion();
+    });
+
+    document.getElementById('buscar-cliente').addEventListener('input', e => renderizarListaClientesSeleccion(e.target.value));
+
+    function renderizarListaClientesSeleccion(filtro = '') {
+      const lista = document.getElementById('lista-seleccion-cliente');
+      let clis = clientes.slice();
+      if (filtro) {
+        const term = filtro.toLowerCase();
+        clis = clis.filter(c => c.nombre.toLowerCase().includes(term));
+      }
+      lista.innerHTML = clis.map(c => `
+        <li class="product-item" style="padding:14px 0;" data-id="${c.id}">
+          <div class="product-info" onclick="seleccionarClienteIndividual('${c.id}')">
+            <div class="product-name">${c.nombre}</div>
+            <div style="font-size:14px; color:#8e8e93;">Deuda: ${formatearDinero(c.deuda)}</div>
+          </div>
+          <div>
+            <button class="icon-btn" style="color:${clientesSeleccionadosFusion.includes(c.id) ? '#4A3628' : '#8e8e93'};" 
+                    onclick="toggleClienteFusion('${c.id}', event)">
+              <i class="fas fa-check-circle"></i>
+            </button>
+          </div>
+        </li>
+      `).join('');
+      document.getElementById('btn-fusionar-clientes').style.display = clientesSeleccionadosFusion.length === 2 ? 'block' : 'none';
+    }
+
+    window.seleccionarClienteIndividual = (id) => {
+      const cli = clientes.find(c => c.id == id);
+      document.getElementById('cliente-seleccionado-label').textContent = cli.nombre;
+      document.getElementById('input-cliente-id').value = cli.id;
+      document.getElementById('modal-selector-cliente').classList.remove('active');
+      clientesSeleccionadosFusion = [];
+    };
+
+    window.toggleClienteFusion = (id, event) => {
+      event.stopPropagation();
+      const idx = clientesSeleccionadosFusion.indexOf(id);
+      if (idx > -1) clientesSeleccionadosFusion.splice(idx, 1);
+      else if (clientesSeleccionadosFusion.length < 2) clientesSeleccionadosFusion.push(id);
+      renderizarListaClientesSeleccion(document.getElementById('buscar-cliente').value);
+    };
+
+    document.getElementById('btn-fusionar-clientes').addEventListener('click', () => {
+      if (clientesSeleccionadosFusion.length !== 2) return;
+      const [id1, id2] = clientesSeleccionadosFusion;
+      const c1 = clientes.find(c => c.id == id1);
+      const c2 = clientes.find(c => c.id == id2);
+      if (!c1 || !c2) return;
+      if (!confirm(`¿Fusionar ${c2.nombre} en ${c1.nombre}? Se sumarán las deudas.`)) return;
+      c1.deuda += c2.deuda;
+      clientes = clientes.filter(c => c.id != id2);
+      clientesSeleccionadosFusion = [];
+      guardarDatos();
+      mostrarToast('Clientes fusionados correctamente');
+      renderizarListaClientesSeleccion(document.getElementById('buscar-cliente').value);
+    });
+
+    document.getElementById('btn-confirmar-venta-final').addEventListener('click', () => {
+      const cant = parseInt(document.getElementById('cantidad-venta').value);
+      const tipo = document.querySelector('input[name="tipo-venta"]:checked')?.value;
+      const precioUnitario = parseFloat(document.getElementById('input-precio-venta-modal').value) || 0;
+      if (!tipo) { mostrarToast('Selecciona un método de pago', 2000); return; }
+      if (precioUnitario <= 0) { mostrarToast('El precio debe ser mayor a 0', 2000); return; }
+      const precioTotalVenta = cant * precioUnitario;
+      const costoTotalVenta = cant * productoVentaSeleccionado.costo;
+      productoVentaSeleccionado.cantidad -= cant;
+      if(tipo === 'contado') {
+         ventas.unshift({
+            id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+            producto: productoVentaSeleccionado.nombre, cantidad: cant,
+            ingreso: precioTotalVenta, costo: costoTotalVenta, ganancia: precioTotalVenta - costoTotalVenta
+         });
+      } else if (tipo === 'fiado') {
+         const clienteId = document.getElementById('input-cliente-id').value;
+         if (!clienteId) { mostrarToast('Selecciona un cliente de la lista'); return; }
+         let cli = clientes.find(c => c.id == clienteId);
+         if (!cli) { mostrarToast('Cliente no encontrado'); return; }
+         cli.deuda += precioTotalVenta;
+         ventas.unshift({
+            id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+            producto: productoVentaSeleccionado.nombre + ' (Fiado a ' + cli.nombre + ')',
+            cantidad: cant, ingreso: 0, costo: costoTotalVenta, ganancia: -costoTotalVenta
+         });
+      }
+      guardarDatos(); renderizarProductos(); renderizarGridVentas(); renderizarClientes();
+      document.getElementById('modal-tipo-venta').classList.remove('active');
+      document.getElementById('cantidad-venta').value = 1;
+      document.getElementById('venta-producto-seleccionado').style.display = 'none';
+      document.getElementById('grid-venta-directa').style.display = 'grid';
+      document.getElementById('buscar-venta').style.display = 'block';
+      productoVentaSeleccionado = null;
+      mostrarToast(tipo === 'contado' ? `✅ Venta al contado registrada` : `✅ Deuda asignada`, 3000);
+    });
+
+    document.getElementById('btn-nuevo-cliente-rapido').addEventListener('click', () => {
+      const nombre = prompt('Nombre del nuevo cliente:');
+      if (!nombre || !nombre.trim()) {
+        if (nombre !== null) mostrarToast('Debes ingresar un nombre válido');
+        return;
+      }
+      const nombreLimpio = nombre.trim();
+      if (clientes.some(c => c.nombre.toLowerCase() === nombreLimpio.toLowerCase())) {
+        mostrarToast('Ya existe un cliente con ese nombre');
+        return;
+      }
+      const nuevoCliente = { id: Date.now(), nombre: nombreLimpio, deuda: 0 };
+      clientes.push(nuevoCliente);
+      guardarDatos();
+      renderizarClientes();
+      document.getElementById('cliente-seleccionado-label').textContent = nuevoCliente.nombre;
+      document.getElementById('input-cliente-id').value = nuevoCliente.id;
+      mostrarToast(`✅ Cliente "${nuevoCliente.nombre}" creado y seleccionado`);
+    });
+
+    // ---------- CLIENTES ----------
+    function renderizarClientes() {
+      const lista = document.getElementById('lista-clientes');
+      if(clientes.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; padding: 20px; color:#8e8e93;">No tienes clientes guardados aún.</p>';
+        return;
+      }
+      let clis = [...clientes].sort((a,b) => b.deuda - a.deuda);
+      lista.innerHTML = clis.map(c => {
+        const deudaBs = (c.deuda * bcvRate).toFixed(2);
+        const eliminarBtn = c.deuda === 0 ? 
+          `<button class="icon-btn danger" onclick="event.stopPropagation(); eliminarCliente(${c.id})" title="Eliminar cliente" style="width:36px; height:36px; font-size:15px;"><i class="fas fa-trash"></i></button>` : '';
+        if (c.deuda > 0.001) {
+          return `
+            <li class="product-item">
+              <div class="product-info" onclick="verHistorialCliente(${c.id})">
+                <div class="product-name" style="font-size:17px;"><i class="fas fa-user-circle" style="color:#D6CCC4; margin-right:6px;"></i> ${c.nombre}</div>
+                <span style="color:#DC2626; font-weight:700; font-size:14px; display:block; margin-top:4px;">
+                  Debe: ${formatearDinero(c.deuda)}<br>
+                  <small style="font-weight:500;">(Bs. ${deudaBs})</small>
+                </span>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${eliminarBtn}
+                <button class="btn btn-outline" style="padding: 10px 16px; font-size:13px; width:auto; border-radius:14px; background:#fff;" onclick="event.stopPropagation(); abrirModalAbono(${c.id})">Abonar</button>
+              </div>
+            </li>`;
+        } else {
+          return `
+            <li class="product-item">
+              <div class="product-info" onclick="verHistorialCliente(${c.id})">
+                <div class="product-name" style="font-size:17px;"><i class="fas fa-user-circle" style="color:#D6CCC4; margin-right:6px;"></i> ${c.nombre}</div>
+                <span style="color:#16A34A; font-weight:600; font-size:14px; display:block; margin-top:4px;"><i class="fas fa-check-circle"></i> Solvente</span>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${eliminarBtn}
+              </div>
+            </li>`;
+        }
+      }).join('');
+    }
+
+    window.verHistorialCliente = (clienteId) => {
+      const cli = clientes.find(c => c.id === clienteId);
+      if (!cli) return;
+      const movimientos = ventas.filter(v => 
+        v.producto.includes('(Fiado a ' + cli.nombre + ')') || 
+        v.producto.startsWith('Abono de deuda - ' + cli.nombre)
+      );
+      document.getElementById('historial-titulo').textContent = 'Historial: ' + cli.nombre;
+      const lista = document.getElementById('lista-historial-cliente');
+      if (movimientos.length === 0) {
+        lista.innerHTML = '<li class="product-item" style="color:#8e8e93; text-align:center; display:block;">Sin movimientos registrados.</li>';
+      } else {
+        lista.innerHTML = movimientos.map(m => `
+          <li class="product-item">
+            <div>
+              <strong style="color:#2C2420;">${m.producto}</strong><br>
+              <small style="color:#8e8e93;">${m.fecha}</small>
+            </div>
+            <div style="font-weight:700; color:${m.ingreso > 0 ? '#16A34A' : '#DC2626'}">
+              ${m.ingreso > 0 ? '+' + formatearDinero(m.ingreso) : formatearDinero(m.costo)}
+            </div>
+          </li>
+        `).join('');
+      }
+      document.getElementById('modal-historial-cliente').classList.add('active');
+    };
+
+    window.abrirModalAbono = (clienteId) => {
+      clienteAbonoActual = clientes.find(c => c.id === clienteId);
+      document.getElementById('lbl-abono-cliente').textContent = clienteAbonoActual.nombre;
+      document.getElementById('lbl-abono-deuda').textContent = formatearDinero(Math.round(clienteAbonoActual.deuda * 100) / 100);
+      const deudaBs = (clienteAbonoActual.deuda * bcvRate).toFixed(2);
+      document.getElementById('lbl-abono-deuda-bs').textContent = `(Bs. ${deudaBs})`;
+      document.getElementById('input-monto-abono').value = '';
+      document.getElementById('abono-dolar-equivalente').textContent = 'Equivale a: $0.00';
+      document.getElementById('modal-abono').classList.add('active');
+    };
+
+    window.actualizarEquivalenteDolarAbono = () => {
+      const montoBs = parseFloat(document.getElementById('input-monto-abono').value) || 0;
+      if (bcvRate > 0) {
+        const equivDolares = montoBs / bcvRate;
+        document.getElementById('abono-dolar-equivalente').textContent = `Equivale a: ${formatearDinero(equivDolares)}`;
+      } else {
+        document.getElementById('abono-dolar-equivalente').textContent = 'Tasa BCV no disponible';
+      }
+    };
+
+    document.getElementById('btn-confirmar-abono').addEventListener('click', () => {
+      const montoBs = parseFloat(document.getElementById('input-monto-abono').value);
+      if(isNaN(montoBs) || montoBs <= 0) { mostrarToast('Ingresa un monto válido'); return; }
+      if (bcvRate <= 0) { mostrarToast('Tasa BCV no cargada, intenta más tarde'); return; }
+      const montoDolares = montoBs / bcvRate;
+      if(montoDolares > clienteAbonoActual.deuda) { 
+        const maxBs = (clienteAbonoActual.deuda * bcvRate).toFixed(2);
+        mostrarToast(`El abono no puede exceder la deuda. Máximo Bs. ${maxBs}`); 
+        return; 
+      }
+      clienteAbonoActual.deuda = Math.round((clienteAbonoActual.deuda - montoDolares) * 100) / 100;
+      ventas.unshift({
+         id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+         producto: 'Abono de deuda - ' + clienteAbonoActual.nombre,
+         cantidad: 1, ingreso: montoDolares, costo: 0, ganancia: montoDolares
+      });
+      guardarDatos(); renderizarClientes();
+      if (document.getElementById('finanzas').classList.contains('active')) renderizarFinanzas();
+      document.getElementById('modal-abono').classList.remove('active');
+      mostrarToast(`✅ Abono de ${formatearDinero(montoDolares)} registrado (Bs. ${montoBs.toFixed(2)})`);
+    });
+
+    window.eliminarCliente = function(id) {
+      const cliente = clientes.find(c => c.id === id);
+      if (!cliente) return;
+      if (cliente.deuda > 0) {
+        mostrarToast('No puedes eliminar un cliente con deuda pendiente');
+        return;
+      }
+      if (!confirm(`¿Eliminar a ${cliente.nombre}?`)) return;
+      clientes = clientes.filter(c => c.id !== id);
+      guardarDatos();
+      renderizarClientes();
+      mostrarToast('🗑️ Cliente eliminado');
+    };
+
+    document.getElementById('btn-agregar-cliente').addEventListener('click', () => {
+      const modalHtml = `
+        <div class="modal-overlay active" id="modal-nuevo-cliente">
+          <div class="modal-sheet">
+            <div class="modal-header">
+              <h2 class="modal-title">➕ Nuevo cliente</h2>
+              <button class="close-modal" onclick="document.getElementById('modal-nuevo-cliente').remove()"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="text" id="input-nombre-cliente" placeholder="Nombre del cliente" class="input-field" style="margin-bottom: 24px;">
+            <button class="btn" id="btn-crear-cliente">Guardar Cliente</button>
+          </div>
+        </div>`;
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      document.getElementById('btn-crear-cliente').addEventListener('click', () => {
+        const nombre = document.getElementById('input-nombre-cliente').value.trim();
+        if (!nombre) { mostrarToast('Ingresa un nombre válido'); return; }
+        if (clientes.some(c => c.nombre.toLowerCase() === nombre.toLowerCase())) {
+          mostrarToast('Ya existe un cliente con ese nombre');
+          return;
+        }
+        clientes.push({ id: Date.now(), nombre: nombre, deuda: 0 });
+        guardarDatos();
+        renderizarClientes();
+        document.getElementById('modal-nuevo-cliente').remove();
+        mostrarToast('✅ Cliente creado');
+      });
+    });
+
+    // ---------- PROVEEDORES ----------
+    function renderizarProveedores() {
+      const lista = document.getElementById('lista-proveedores');
+      if(proveedores.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; padding: 20px; color:#8e8e93;">No hay proveedores registrados.</p>';
+        return;
+      }
+      
+      lista.innerHTML = proveedores.map(p => {
+        const btnEliminar = p.deuda === 0 ? `<button class="icon-btn danger" onclick="eliminarProveedor(${p.id})" style="width:36px; height:36px; font-size:15px;"><i class="fas fa-trash"></i></button>` : '';
+        return `
+        <li class="product-item">
+          <div class="product-info">
+            <div class="product-name" style="font-size:17px;">
+              <i class="fas fa-truck" style="color:#D6CCC4; margin-right:6px;"></i> ${p.nombre}
+            </div>
+            <span style="color:${p.deuda > 0 ? '#D97706' : '#16A34A'}; font-weight:600; font-size:14px; margin-top:6px; display:block;">
+              ${p.deuda > 0 ? 'Debes: ' + formatearDinero(p.deuda) : '<i class="fas fa-check-circle"></i> Sin deudas'}
+            </span>
+          </div>
+          <div style="display:flex; gap:6px; align-items:center;">
+            ${btnEliminar}
+            <button class="btn" style="background:#D97706; color:white; padding: 10px 16px; width:auto; border-radius:14px; font-size:13px;" onclick="abrirModalAbonoProveedor(${p.id})">
+              Pagar
+            </button>
+          </div>
+        </li>
+      `}).join('');
+    }
+
+    window.abrirModalNuevoProveedor = () => {
+      document.getElementById('proveedor-nombre').value = '';
+      document.getElementById('modal-proveedor').classList.add('active');
+    };
+
+    document.getElementById('btn-guardar-proveedor').addEventListener('click', () => {
+      const nombre = document.getElementById('proveedor-nombre').value.trim();
+      if (!nombre) { mostrarToast('Nombre requerido'); return; }
+      if (proveedores.some(p => p.nombre.toLowerCase() === nombre.toLowerCase())) {
+        mostrarToast('Ya existe este proveedor'); return;
+      }
+      proveedores.push({ id: Date.now(), nombre: nombre, deuda: 0 });
+      guardarDatos();
+      renderizarProveedores();
+      actualizarSelectProveedoresCompra();
+      document.getElementById('modal-proveedor').classList.remove('active');
+      mostrarToast('✅ Proveedor agregado');
+    });
+
+    window.eliminarProveedor = (id) => {
+      if (!confirm('¿Seguro que deseas eliminar este proveedor?')) return;
+      proveedores = proveedores.filter(p => p.id !== id);
+      guardarDatos();
+      renderizarProveedores();
+      mostrarToast('Proveedor eliminado');
+    };
+
+    window.abrirModalAbonoProveedor = (id) => {
+      proveedorAbonoActual = proveedores.find(p => p.id === id);
+      if (!proveedorAbonoActual) return;
+      document.getElementById('lbl-prov-nombre').textContent = proveedorAbonoActual.nombre;
+      document.getElementById('lbl-prov-deuda').textContent = formatearDinero(proveedorAbonoActual.deuda);
+      document.getElementById('input-monto-pago-prov').value = '';
+      document.getElementById('modal-abono-proveedor').classList.add('active');
+    };
+
+    document.getElementById('btn-confirmar-pago-prov').addEventListener('click', () => {
+      const monto = parseFloat(document.getElementById('input-monto-pago-prov').value);
+      if (isNaN(monto) || monto <= 0) { mostrarToast('Monto inválido'); return; }
+      if (monto > proveedorAbonoActual.deuda) { mostrarToast('No puedes pagar más de lo que debes'); return; }
+
+      proveedorAbonoActual.deuda -= monto;
+      
+      gastos.unshift({
+        id: Date.now() + Math.random(),
+        descripcion: `Pago a Proveedor: ${proveedorAbonoActual.nombre}`,
+        monto: monto,
+        esPagoDeuda: true, 
+        fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})
+      });
+
+      guardarDatos();
+      renderizarProveedores();
+      if (document.getElementById('finanzas').classList.contains('active')) renderizarFinanzas();
+      document.getElementById('modal-abono-proveedor').classList.remove('active');
+      mostrarToast(`✅ Pago de ${formatearDinero(monto)} registrado`);
+    });
+
+    window.ingresarCajaManual = () => {
+      const monto = parseFloat(prompt('Monto en dólares a ingresar directamente a la Caja (Ej. Base o Inversión inicial):'));
+      if (monto > 0) {
+        ventas.unshift({
+          id: Date.now(), fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
+          producto: 'Ingreso Manual a Caja (Aporte)',
+          cantidad: 1, ingreso: monto, costo: 0, ganancia: 0
+        });
+        guardarDatos();
+        if (document.getElementById('finanzas').classList.contains('active')) renderizarFinanzas();
+        mostrarToast('✅ Caja actualizada exitosamente');
+      }
+    };
+
+    // ---------- FINANZAS ----------
+    function renderizarFinanzas() {
+      let totalIngresosVentas = 0, totalCostos = 0, totalGanancia = 0;
+      const listaVentas = document.getElementById('lista-ventas');
+      
+      if (ventas.length === 0) listaVentas.innerHTML = '<div style="text-align:center; padding:20px; color:#8e8e93;">No hay ventas registradas</div>';
+      else listaVentas.innerHTML = '';
+      
+      ventas.forEach(v => {
+        totalIngresosVentas += v.ingreso || 0;
+        totalCostos += v.costo || 0;
+        totalGanancia += v.ganancia || 0;
+        
+        const colorMonto = v.ingreso > 0 ? '#16A34A' : '#8e8e93';
+        listaVentas.innerHTML += `
+          <div class="venta-item">
+            <div class="venta-info">
+              <h4 style="color:#2C2420;">${v.cantidad}x ${v.producto}</h4>
+              <p>${v.fecha}</p>
+            </div>
+            <div class="venta-monto" style="color: ${colorMonto}">${v.ingreso > 0 ? '+'+formatearDinero(v.ingreso) : 'Fiado'}</div>
+          </div>`;
+      });
+      
+      const totalGastosEfectivo = gastos.reduce((acc, g) => acc + (g.monto || 0), 0);
+      const totalGastosOperativos = gastos.filter(g => !g.esPagoDeuda).reduce((acc, g) => acc + (g.monto || 0), 0);
+
+      const totalComprasContado = compras.filter(c => c.metodo === 'contado').reduce((acc, c) => acc + (c.total || 0), 0);
+
+      const cajaReal = totalIngresosVentas - totalGastosEfectivo - totalComprasContado;
+      const gananciaNeta = totalGanancia - totalGastosOperativos; 
+      
+      let capitalNeto = 0;
+      productos.forEach(p => {
+        if (!esProductoFinal(p.nombre) && p.cantidad > 0) capitalNeto += p.cantidad * p.costo;
+      });
+
+      const totalPorCobrar = clientes.reduce((acc, cli) => acc + (cli.deuda || 0), 0);
+      const totalDeudaProv = proveedores.reduce((acc, p) => acc + (p.deuda || 0), 0);
+
+      setTextSafe('fin-caja', cajaReal);
+      setTextSafe('fin-por-pagar', totalDeudaProv);
+      setTextSafe('fin-ganancia', gananciaNeta);
+      setTextSafe('fin-gastos', totalGastosOperativos);
+      setTextSafe('fin-compras', capitalNeto);
+      setTextSafe('fin-por-cobrar', totalPorCobrar);
+      setTextSafe('fin-ingresos', totalIngresosVentas);
+      setTextSafe('fin-costos', totalCostos);
+      
+      const finCajaEl = document.getElementById('fin-caja');
+      if(finCajaEl) finCajaEl.style.color = cajaReal >= 0 ? '#16A34A' : '#DC2626';
+      const finGananciaEl = document.getElementById('fin-ganancia');
+      if(finGananciaEl) finGananciaEl.style.color = gananciaNeta >= 0 ? '#16A34A' : '#DC2626';
+
+      function setTextSafe(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = formatearDinero(value);
+      }
+    }
+
+    function renderizarGastos() {
+      const lista = document.getElementById('lista-gastos');
+      if(gastos.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; color:#8e8e93; font-size:13px;">No hay gastos registrados aún.</p>';
+        return;
+      }
+      lista.innerHTML = gastos.map(g => `
+        <div class="venta-item">
+          <div class="venta-info">
+            <h4 style="color:#2C2420;">${g.descripcion}</h4>
+            <p>${g.fecha}</p>
+          </div>
+          <div class="venta-monto" style="color: #D97706;">-${formatearDinero(g.monto)}</div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('btn-guardar-gasto').addEventListener('click', () => {
+      const desc = document.getElementById('input-desc-gasto').value.trim();
+      const monto = parseFloat(document.getElementById('input-monto-gasto').value);
+      if(!desc || isNaN(monto) || monto <= 0) { mostrarToast('Ingresa un concepto y un monto válido', 2000); return; }
+      gastos.unshift({
+        id: Date.now(),
+        descripcion: desc,
+        monto: monto,
+        esPagoDeuda: false,
+        fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})
+      });
+      document.getElementById('input-desc-gasto').value = '';
+      document.getElementById('input-monto-gasto').value = '';
+      guardarDatos();
+      mostrarToast('✅ Gasto registrado y descontado', 2500);
+    });
+
+    document.getElementById('btn-limpiar-finanzas').addEventListener('click', () => {
+      if (ventas.length === 0 && gastos.length === 0 && compras.length === 0 && producciones.length === 0) {
+        mostrarToast('No hay nada que limpiar'); return;
+      }
+      papeleraVentas = ventas;
+      papeleraGastos = gastos;
+      ventas = [];
+      gastos = [];
+      compras = [];
+      producciones = [];
+      guardarDatos();
+      mostrarToast('Historial limpiado. Toca este aviso para deshacer (30s)', 30000);
+      let timeout = setTimeout(() => {
+        papeleraVentas = []; papeleraGastos = [];
+        toastEl.onclick = null;
+      }, 30000);
+      toastEl.onclick = () => {
+        clearTimeout(timeout);
+        ventas = papeleraVentas;
+        gastos = papeleraGastos;
+        papeleraVentas = []; papeleraGastos = [];
+        guardarDatos();
+        toastEl.classList.remove('show');
+        mostrarToast('✅ Restaurado');
+        toastEl.onclick = null;
+      };
+    });
+
+    function exportarDatos() {
+      const datos = { productos, recetas, ventas, clientes, gastos, compras, producciones, empleados, proveedores };
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'almacen_respaldo.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      mostrarToast('📁 Respaldo guardado', 2000);
+    }
+
+    document.getElementById('btn-exportar').addEventListener('click', exportarDatos);
+    document.getElementById('btn-importar').addEventListener('click', () => {
+      document.getElementById('input-importar').click();
+    });
+
+    document.getElementById('input-importar').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const datos = JSON.parse(ev.target.result);
+          if (datos.productos && Array.isArray(datos.productos) && datos.recetas && Array.isArray(datos.recetas) && Array.isArray(datos.ventas) && Array.isArray(datos.clientes) && Array.isArray(datos.gastos) && Array.isArray(datos.compras) && Array.isArray(datos.producciones)) {
+            localStorage.setItem('almacen_fusion_productos_v7_esencias', JSON.stringify(datos.productos));
+            localStorage.setItem('almacen_fusion_recetas_v7_esencias', JSON.stringify(datos.recetas));
+            localStorage.setItem('almacen_fusion_ventas_v7_esencias', JSON.stringify(datos.ventas));
+            localStorage.setItem('almacen_fusion_clientes_v7_esencias', JSON.stringify(datos.clientes));
+            localStorage.setItem('almacen_fusion_gastos_v7_esencias', JSON.stringify(datos.gastos));
+            localStorage.setItem('almacen_fusion_compras_v7_esencias', JSON.stringify(datos.compras));
+            localStorage.setItem('almacen_fusion_producciones_v7_esencias', JSON.stringify(datos.producciones));
+            if(datos.empleados) localStorage.setItem('almacen_fusion_empleados_v7', JSON.stringify(datos.empleados));
+            if(datos.proveedores) localStorage.setItem('almacen_fusion_proveedores_v7', JSON.stringify(datos.proveedores));
+            mostrarToast('✅ Datos restaurados. Recargando...', 1500);
+            setTimeout(() => location.reload(), 1200);
+          } else {
+            mostrarToast('❌ El archivo no tiene el formato correcto.', 3000);
+          }
+        } catch (err) {
+          mostrarToast('❌ Error al leer el archivo JSON.', 3000);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const target = item.dataset.tab;
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(target).classList.add('active');
+        if (target === 'produccion') actualizarVistaReceta();
+        if (target === 'ventas') renderizarGridVentas();
+        if (target === 'clientes') renderizarClientes();
+        if (target === 'proveedores') renderizarProveedores();
+        if (target === 'finanzas') { renderizarFinanzas(); renderizarGastos(); }
+        if (target === 'empleados') renderizarEmpleados();
+      });
+    });
+
+    document.getElementById('buscar-producto').addEventListener('input', e => renderizarProductos(e.target.value));
+    document.getElementById('receta-select').addEventListener('change', (e) => { 
+      recetaActual = recetas.find(r => r.id === e.target.value); 
+      actualizarVistaReceta(); 
+    });
+    document.getElementById('cantidad-produccion').addEventListener('input', actualizarVistaReceta);
+
+    document.getElementById('btn-sync-status').addEventListener('click', () => {
+      if (syncStatus === 'error' || syncStatus === 'offline') {
+        guardarDatos().catch(() => {});
+      } else {
+        mostrarToast('Sincronizado al día');
+      }
+    });
+
+    async function fetchBCVRate() {
+      try {
+        const response = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+        const data = await response.json();
+        bcvRate = data.promedio;
+        document.getElementById('bcv-rate').textContent = 'Bs. ' + bcvRate.toFixed(2);
+        if (document.getElementById('clientes').classList.contains('active')) {
+          renderizarClientes();
+        }
+      } catch (error) {
+        console.error('Error obteniendo tasa BCV:', error);
+        document.getElementById('bcv-rate').textContent = 'Bs. --';
+      }
+    }
+
+    fetchBCVRate();
+    setInterval(fetchBCVRate, 600000);
+    cargarDatos();
+
+    window.addEventListener('online', () => {
+      if (syncStatus === 'offline' || syncStatus === 'error') {
+        guardarDatos().catch(() => actualizarIndicadorSync('error'));
+      }
+    });
+    window.addEventListener('offline', () => actualizarIndicadorSync('offline'));
+    if (!navigator.onLine) actualizarIndicadorSync('offline');
+    else actualizarIndicadorSync('syncing');
+
+    const checkPaquete = document.getElementById('usar-paquete-costo');
+    const zonaPaquete = document.getElementById('zona-paquete-costo');
+    if (checkPaquete && zonaPaquete) {
+      checkPaquete.addEventListener('change', () => {
+        zonaPaquete.style.display = checkPaquete.checked ? 'block' : 'none';
+        if (!checkPaquete.checked) {
+          document.getElementById('paquete-precio').value = '';
+          document.getElementById('paquete-cantidad').value = '';
+          document.getElementById('lbl-costo-unitario-paquete').textContent = '';
+          document.getElementById('costo-total-producto').disabled = false;
+          document.getElementById('costo-total-producto').value = '';
+        } else {
+          document.getElementById('costo-total-producto').disabled = true;
+        }
+        calcularCostoUnitario();
+      });
+    }
+
+    function calcularCostoDesdePaquete() {
+      const precioPaq = parseFloat(document.getElementById('paquete-precio').value) || 0;
+      const cantPaq = parseFloat(document.getElementById('paquete-cantidad').value) || 0;
+      const usandoPaquete = document.getElementById('usar-paquete-costo').checked;
+      if (usandoPaquete && precioPaq > 0 && cantPaq > 0) {
+        const costoUnitario = precioPaq / cantPaq;
+        document.getElementById('costo-total-producto').value = costoUnitario;
+        document.getElementById('lbl-costo-unitario-paquete').innerHTML = 
+          `✅ Costo por unidad = <strong>${formatearDinero(costoUnitario)}</strong> (precisión completa)`;
+      } else {
+        document.getElementById('costo-total-producto').value = '';
+        document.getElementById('lbl-costo-unitario-paquete').textContent = '';
+      }
+    }
+
+    document.getElementById('paquete-precio').addEventListener('input', calcularCostoDesdePaquete);
+    document.getElementById('paquete-cantidad').addEventListener('input', calcularCostoDesdePaquete);
+
+    // ---------- EMPLEADOS ----------
+    function renderizarEmpleados() {
+      const lista = document.getElementById('lista-empleados');
+      if(empleados.length === 0) {
+        lista.innerHTML = '<p style="text-align:center; padding: 20px; color:#8e8e93;">No hay empleados registrados.</p>';
+        return;
+      }
+      
+      lista.innerHTML = empleados.map(emp => `
+        <li class="product-item">
+          <div class="product-info" onclick="abrirModalEmpleado(${emp.id})">
+            <div class="product-name" style="font-size:17px; color:#2C2420;">
+              <i class="fas fa-user-tie" style="color:#D6CCC4; margin-right:6px;"></i> ${emp.nombre}
+            </div>
+            <div style="font-size:14px; color:#8e8e93; margin-top:4px;">Rol: ${emp.cargo}</div>
+            <span style="color:#4A3628; font-weight:700; font-size:15px; margin-top:6px; display:block;">
+              Sueldo: ${formatearDinero(emp.sueldo)}
+            </span>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="icon-btn danger" onclick="eliminarEmpleado(${emp.id})" style="width:40px; height:40px; font-size:15px;"><i class="fas fa-trash"></i></button>
+            <button class="btn" style="background:#4A3628; color:white; padding: 10px 16px; width:auto; border-radius:14px; font-size:14px;" onclick="pagarEmpleado(${emp.id})">
+              <i class="fas fa-hand-holding-usd" style="margin-right:4px;"></i> Pagar
+            </button>
+          </div>
+        </li>
+      `).join('');
+    }
+
+    window.abrirModalEmpleado = (id = null) => {
+      document.getElementById('empleado-nombre').value = '';
+      document.getElementById('empleado-cargo').value = '';
+      document.getElementById('empleado-sueldo').value = '';
+      document.getElementById('empleado-id').value = '';
+      
+      if (id) {
+        const emp = empleados.find(e => e.id === id);
+        if (emp) {
+          document.getElementById('titulo-modal-empleado').textContent = 'Editar Empleado';
+          document.getElementById('empleado-nombre').value = emp.nombre;
+          document.getElementById('empleado-cargo').value = emp.cargo;
+          document.getElementById('empleado-sueldo').value = emp.sueldo;
+          document.getElementById('empleado-id').value = emp.id;
+        }
+      } else {
+        document.getElementById('titulo-modal-empleado').textContent = 'Nuevo Empleado';
+      }
+      
+      document.getElementById('modal-empleado').classList.add('active');
+    };
+
+    document.getElementById('btn-guardar-empleado').addEventListener('click', () => {
+      const nombre = document.getElementById('empleado-nombre').value.trim();
+      const cargo = document.getElementById('empleado-cargo').value.trim();
+      const sueldo = parseFloat(document.getElementById('empleado-sueldo').value);
+      const idExistente = document.getElementById('empleado-id').value;
+
+      if (!nombre || !cargo || isNaN(sueldo) || sueldo < 0) {
+        mostrarToast('Por favor, completa todos los campos correctamente.', 2000);
+        return;
+      }
+
+      if (idExistente) {
+        const emp = empleados.find(e => e.id == idExistente);
+        if (emp) {
+          emp.nombre = nombre;
+          emp.cargo = cargo;
+          emp.sueldo = sueldo;
+        }
+      } else {
+        empleados.push({
+          id: Date.now(),
+          nombre: nombre,
+          cargo: cargo,
+          sueldo: sueldo
+        });
+      }
+
+      guardarDatos();
+      renderizarEmpleados();
+      document.getElementById('modal-empleado').classList.remove('active');
+      mostrarToast('✅ Datos del empleado guardados', 2000);
+    });
+
+    window.eliminarEmpleado = (id) => {
+      if (!confirm('¿Estás seguro de eliminar a este empleado? Su historial de pagos se mantendrá en gastos.')) return;
+      empleados = empleados.filter(e => e.id !== id);
+      guardarDatos();
+      renderizarEmpleados();
+      mostrarToast('🗑️ Empleado eliminado', 2000);
+    };
+
+    window.pagarEmpleado = (id) => {
+      const emp = empleados.find(e => e.id === id);
+      if (!emp) return;
+      
+      if (!confirm(`¿Confirmas el pago de nómina de ${formatearDinero(emp.sueldo)} a ${emp.nombre}? Esto se descontará de la caja y de la ganancia neta.`)) return;
+
+      gastos.unshift({
+        id: Date.now() + Math.random(),
+        descripcion: `Nómina: ${emp.nombre} (${emp.cargo})`,
+        monto: emp.sueldo,
+        esPagoDeuda: false, // Las nóminas SÍ afectan la ganancia y la caja
+        fecha: new Date().toLocaleString('es-VE', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'})
+      });
+
+      guardarDatos();
+      if (document.getElementById('finanzas').classList.contains('active')) {
+        renderizarFinanzas();
+        renderizarGastos();
+      }
+      mostrarToast(`✅ Pago de nómina registrado con éxito`, 3000);
+    };
+
+  })();
+</script>
+</body>
+</html>
