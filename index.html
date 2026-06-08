@@ -153,7 +153,17 @@
     
     /* Finanzas */
     .finanzas-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
-    .dash-card { background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #EBE6E0; }
+    .dash-card { 
+      background: #fff; padding: 18px; border-radius: 20px; border: 1px solid #EBE6E0; 
+      cursor: pointer; transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .dash-card:active { transform: scale(0.96); }
+    .dash-card::after { 
+      content: '\f05a'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
+      position: absolute; top: 12px; right: 12px; color: #EBE6E0; font-size: 12px; opacity: 0.7;
+    }
+    .dash-card:hover { box-shadow: 0 4px 12px rgba(44, 36, 32, 0.05); }
     .dash-label { font-size: 12px; font-weight: 600; color: #8e8e93; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
     .dash-value { font-size: 24px; font-weight: 700; color: #2C2420; }
     
@@ -342,36 +352,36 @@
 
   <section id="finanzas" class="section">
     <div class="finanzas-dashboard">
-      <div class="dash-card" style="background:#F0FDF4; border-color:#BBF7D0;">
+      <div class="dash-card" style="background:#F0FDF4; border-color:#BBF7D0;" onclick="abrirInfoFinanzas('caja')">
         <div class="dash-label">Caja (Efectivo)</div>
         <div class="dash-value" id="fin-caja" style="color: #16A34A;">$0.00</div>
       </div>
-      <div class="dash-card" style="background:#FFFBEB; border-color:#FDE68A;">
+      <div class="dash-card" style="background:#FFFBEB; border-color:#FDE68A;" onclick="abrirInfoFinanzas('por-pagar')">
         <div class="dash-label">Deuda Proveedores</div>
         <div class="dash-value" id="fin-por-pagar" style="color: #D97706;">$0.00</div>
       </div>
       
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('ganancia')">
         <div class="dash-label">Ganancia Neta</div>
         <div class="dash-value" id="fin-ganancia" style="color: #16A34A;">$0.00</div>
       </div>
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('gastos')">
         <div class="dash-label">Gastos Operativos</div>
         <div class="dash-value" id="fin-gastos" style="color: #D97706;">$0.00</div>
       </div>
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('capital')">
         <div class="dash-label">Capital (Inventario)</div>
         <div class="dash-value" id="fin-compras" style="color: #4A3628;">$0.00</div>
       </div>
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('por-cobrar')">
         <div class="dash-label">Crédito (A favor)</div>
         <div class="dash-value" id="fin-por-cobrar" style="color: #8E44AD;">$0.00</div>
       </div>
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('ingresos')">
         <div class="dash-label">Ingresos Brutos</div>
         <div class="dash-value" id="fin-ingresos" style="color: #2C2420;">$0.00</div>
       </div>
-      <div class="dash-card">
+      <div class="dash-card" onclick="abrirInfoFinanzas('costos')">
         <div class="dash-label">Costo de Ventas</div>
         <div class="dash-value" id="fin-costos" style="color: #DC2626;">$0.00</div>
       </div>
@@ -403,6 +413,7 @@
     </div>
   </section>
 
+  <!-- MODALES EXISTENTES -->
   <div class="modal-overlay" id="modal-receta">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -633,7 +644,6 @@
     </div>
   </div>
 
-  <!-- NUEVO MODAL: FIAR DIRECTO DESDE HISTORIAL -->
   <div class="modal-overlay" id="modal-fiar-directo">
     <div class="modal-sheet">
       <div class="modal-header">
@@ -716,6 +726,25 @@
     </div>
   </div>
 
+  <!-- NUEVO MODAL: INFORMACIÓN DE FINANZAS -->
+  <div class="modal-overlay" id="modal-info-finanzas">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="titulo-info-finanzas">Título</h2>
+        <button class="close-modal" onclick="document.getElementById('modal-info-finanzas').classList.remove('active')"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="background: #FCFAF8; padding: 20px; border-radius: 18px; border: 1px solid #EBE6E0;">
+        <p style="font-size: 15px; color: #2C2420; line-height: 1.5; margin-bottom: 16px;" id="desc-info-finanzas"></p>
+        
+        <div style="background: #FFFBEB; padding: 16px; border-radius: 14px; border: 1px solid #FDE68A;">
+          <p style="font-size: 13px; color: #D97706; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;"><i class="fas fa-lightbulb"></i> Ejemplo práctico</p>
+          <p style="font-size: 14px; color: #4A3628; line-height: 1.4;" id="ejemplo-info-finanzas"></p>
+        </div>
+      </div>
+      <button class="btn" style="margin-top: 24px; background: #EBE6E0; color: #4A3628;" onclick="document.getElementById('modal-info-finanzas').classList.remove('active')">Entendido</button>
+    </div>
+  </div>
+
   <div id="toast" class="toast-message">Mensaje</div>
 
   <nav class="bottom-nav">
@@ -742,6 +771,59 @@
 
   (function(){
     "use strict";
+
+    // --- NUEVO DICCIONARIO DE DEFINICIONES FINANCIERAS ---
+    const INFO_FINANZAS = {
+      'caja': {
+        titulo: 'Caja (Efectivo / Banco)',
+        desc: 'Es el dinero líquido y real que tienes disponible a favor en este preciso momento.',
+        ejemplo: 'Incluye lo que tienes físicamente en la gaveta, pagos móviles o transferencias en el banco. Es el resultado de tus ventas al contado, menos los gastos y las compras que ya pagaste.'
+      },
+      'por-pagar': {
+        titulo: 'Deuda a Proveedores',
+        desc: 'Dinero que debes a terceros por mercancía que adquiriste a crédito (fiada) para el almacén.',
+        ejemplo: 'Los 2 sacos de harina y la caja de manteca que te dejó el distribuidor ayer y acordaste pagarle el viernes.'
+      },
+      'ganancia': {
+        titulo: 'Ganancia Neta',
+        desc: 'Es el beneficio real de tu negocio. Lo que te queda libre después de restar el costo de la mercancía que vendiste y todos los gastos operativos.',
+        ejemplo: 'Si vendiste $100 en pan, hacer ese pan te costó $40 en ingredientes, y pagaste $10 de pasaje (gasto), tu ganancia neta es $50. Ese es el dinero que realmente ganaste.'
+      },
+      'gastos': {
+        titulo: 'Gastos Operativos',
+        desc: 'Todo el dinero que sale del negocio que NO es para comprar materia prima para producir.',
+        ejemplo: 'Pago de nómina a los ayudantes, transporte, reparaciones, luz, o la compra de bolsas extra que no estaban en la fórmula.'
+      },
+      'capital': {
+        titulo: 'Capital (Inventario)',
+        desc: 'Es el valor total de la mercancía y materia prima que tienes guardada en el almacén en este momento.',
+        ejemplo: 'Si tienes 10 sacos de harina en stock que compraste a $40 cada uno, tienes $400 "congelados" en forma de capital de inventario.'
+      },
+      'por-cobrar': {
+        titulo: 'Crédito (A favor)',
+        desc: 'Es el dinero total que tus clientes te deben por productos que se llevaron y no te pagaron al instante.',
+        ejemplo: 'Las facturas pendientes de la bodega de la esquina que se llevó 50 panes campesinos y te los paga a final de semana.'
+      },
+      'ingresos': {
+        titulo: 'Ingresos Brutos',
+        desc: 'Es la suma total del dinero que ha generado el negocio por ventas, antes de descontar los gastos ni el costo de la harina.',
+        ejemplo: 'Si a lo largo del mes has vendido 500 unidades de pan a $1, tu ingreso bruto es $500, sin importar cuánto costó fabricarlos.'
+      },
+      'costos': {
+        titulo: 'Costo de Ventas',
+        desc: 'Es lo que te costó producir EXCLUSIVAMENTE los productos que ya lograste vender.',
+        ejemplo: 'Si compraste $200 en harina, pero hoy solo vendiste 50 panes, tu costo de venta es exactamente lo que costó la harina, azúcar y manteca que usaste para esos 50 panes, no los $200 enteros.'
+      }
+    };
+
+    window.abrirInfoFinanzas = (tipo) => {
+      const info = INFO_FINANZAS[tipo];
+      if (!info) return;
+      document.getElementById('titulo-info-finanzas').innerHTML = `<i class="fas fa-info-circle" style="color:#4A3628; margin-right:8px;"></i> ${info.titulo}`;
+      document.getElementById('desc-info-finanzas').textContent = info.desc;
+      document.getElementById('ejemplo-info-finanzas').textContent = info.ejemplo;
+      document.getElementById('modal-info-finanzas').classList.add('active');
+    };
 
     const PRODUCTOS_INICIALES = [
       { nombre: "Harina", cantidad: 0, unidad: "sacos", costo: 38.5, precio: 0, paqueteCantidad: 0 },
@@ -775,7 +857,7 @@
       { nombre: "Catalinas pequeñas sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.2, paqueteCantidad: 0 },
       { nombre: "Paquete Roscas pequeñas 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 3.5, paqueteCantidad: 0 },
       { nombre: "Roscas pequeñas sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.2, paqueteCantidad: 0 },
-      { nombre: "Paquete Pan andino 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 4.0, paqueteCantidad: 0 },
+      { nombre: "Paquete Pan andino 1kg", quantity: 0, unidad: "unidades", costo: 0, precio: 4.0, paqueteCantidad: 0 },
       { nombre: "Pan andino sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 2.0, paqueteCantidad: 0 },
       { nombre: "Paquete Pan de guayaba 1kg", cantidad: 0, unidad: "unidades", costo: 0, precio: 4.0, paqueteCantidad: 0 },
       { nombre: "Pan de guayaba sueltas", cantidad: 0, unidad: "unidades", costo: 0, precio: 0.5, paqueteCantidad: 0 },
@@ -987,7 +1069,7 @@
 
     let productos = [], recetas = [], ventas = [], clientes = [], gastos = [], compras = [], producciones = [], empleados = [], proveedores = [];
     let recetaActual = null, prodEditando = null, productoVentaSeleccionado = null, clienteAbonoActual = null, proveedorAbonoActual = null;
-    let clienteFiarActual = null, productoFiarSeleccionado = null; // Nuevas variables globales
+    let clienteFiarActual = null, productoFiarSeleccionado = null; 
     let ultimaActualizacionLocal = null;
     let ingredientesTemporales = [];
     let bcvRate = 0;
